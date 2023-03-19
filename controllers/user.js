@@ -4,8 +4,30 @@ const orderPlace = require('../models/orders')
 const categorySearch = require('../models/catogory')
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 require('dotenv').config({ path: __dirname + '../config/.env' })
 
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.emailaccount,
+        pass: process.env.passwordcode
+    }
+});
+
+const mailOptions = {
+    from: process.env.emailaccount,
+    to: 'mjsmzjasim@gmail.com',
+    subject: 'Test Email',
+    text: 'Hello, this is a test email from Nodemailer!'
+};
+transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+        console.log(error);
+    } else {
+        console.log('Email sent: ' + info.response);
+    }
+});
 const Razorpay = require('razorpay');
 const razorpay = new Razorpay({
     key_id: process.env.key_id,
@@ -455,7 +477,6 @@ const add_to_cart = async (req, res, next) => {
 }
 const deleteProductCart = async (req, res, next) => {
     try {
-
         const { pdt_id } = req.body
         const id = req.session.login._id
         await userModify.findOneAndUpdate({ _id: id }, {
@@ -484,7 +505,7 @@ const remove_cart = async (req, res, next) => {
             { _id: id, "cart.product": pdt_id },
             { $inc: { "cart.$.quantity": -1 } }
         ).catch((err) => console.log(err))
-       
+
         const cartzero = userModify.findOne({ _id: id })
         console.log(cartzero)
 
