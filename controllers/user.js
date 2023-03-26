@@ -2,11 +2,16 @@ const userModify = require('../models/user')
 const productView = require('../models/product')
 const orderPlace = require('../models/orders')
 const categorySearch = require('../models/catogory')
+const couponModel = require('../models/coupon')
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 require('dotenv').config({ path: __dirname + '../config/.env' })
-
+const Razorpay = require('razorpay');
+const razorpay = new Razorpay({
+    key_id: process.env.key_id,
+    key_secret: process.env.key_secret,
+});
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -14,38 +19,52 @@ let transporter = nodemailer.createTransport({
         pass: process.env.passwordcode
     }
 });
+function validateEmail(email) {
 
-const mailOptions = {
-    from: process.env.emailaccount,
-    to: 'mjsmzjasim@gmail.com',
-    subject: 'Test Email',
-    text: 'Hello, this is a test email from Nodemailer!'
-};
-transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-        console.log(error);
-    } else {
-        console.log('Email sent: ' + info.response);
+    const regex = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+    return regex.test(email);
+}
+const EmailCheck = async (req, res, next) => {
+    try {
+        const email = req.body.email
+        const userdata = await userModify.findOne({ email: email })
+        console.log(userdata)
+        if (validateEmail(email) == false) {
+            res.json({
+                status: true,
+                userdata: "Enter Valid email"
+            })
+        } else if (userdata) {
+            res.json({
+                status: true,
+                userdata: "email already exist"
+            })
+        } else {
+            res.json({
+                status: true,
+                userdata: false
+            })
+        }
+    } catch (error) {
+        console.log(error.message)
     }
-});
-const Razorpay = require('razorpay');
-const razorpay = new Razorpay({
-    key_id: process.env.key_id,
-    key_secret: process.env.key_secret,
-});
-const accountSid = process.env.accountSid;
-const authToken = process.env.authToken;
-const client = require('twilio')(accountSid, authToken);
+}
 
-const sendOTP = async (toNumber, otp) => {
-    await client.messages
-        .create({
-            body: `Your Otp is ${otp}`,
-            from: '+15674092922',
-            to: toNumber
-        })
-        .then(message => console.log(message.sid))
-        .catch(error => console.error(error));
+const sendOTP = async (toMail, otp) => {
+    const mailOptions = {
+        from: process.env.emailaccount,
+        to: toMail,
+        subject: 'Test Email',
+        text: `Thanks for registering Your Otp is ${otp}`
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            return false
+        } else {
+            console.log(otp);
+            return true
+        }
+    });
 }
 const securePassword = async (password) => {
     try {
@@ -67,25 +86,23 @@ const load_landing = async (req, res, next) => {
         next(err);
     }
 }
-const loadPhoneNumber = async (req, res, next) => {
+const loadEmailSend = async (req, res, next) => {
     try {
-        alertMessage = req.session.loginmessage
-        req.session.loginmessage = ""
-        res.render('phoneNumber', { alertMessage })
+        res.render('EmailToSend')
     } catch (err) {
         console.log(err.message)
         next(err);
     }
 }
-const postNumber = async (req, res, next) => {
+const postEmail = async (req, res, next) => {
     try {
-        const sendMobile = "+91" + req.body.mobile
-        console.log(sendMobile)
-        req.session.mobile = sendMobile
+        const sender = req.body.email
+        console.log(sender)
+        req.session.email = sender
         const otpSend = Math.floor((Math.random() * 1000000) + 1)
         console.log(otpSend)
         req.session.sendOtp = otpSend
-        sendOTP(sendMobile, otpSend)
+        sendOTP(sender, otpSend)
         res.render('otpChecking')
     } catch (error) {
         console.log(error.message)
@@ -109,10 +126,10 @@ const verifyOtp = async (req, res, next) => {
 }
 const load_SignUp = async (req, res, next) => {
     try {
-        mobile = req.session.mobile
+        const email = req.session.email
         let alertMessage = req.session.signupmessage
         req.session.signupmessage = ""
-        res.render('signup', { alertMessage, mobile })
+        res.render('signup', { alertMessage, email })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -133,6 +150,7 @@ const post_SignIn = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         let userdata = await userModify.findOne({ email: email });
+          
         if (userdata) {
             const pass = await bcrypt.compare(password, userdata.password)
             if (pass) {
@@ -154,7 +172,7 @@ const post_SignIn = async (req, res, next) => {
 }
 const loadForgotPassword = async (req, res, next) => {
     try {
-        res.render('phoneNumberForget')
+        res.render('emailForgetpass')
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -162,16 +180,16 @@ const loadForgotPassword = async (req, res, next) => {
 }
 const postNumberForgetPass = async (req, res, next) => {
     try {
-        const sendMobile = "91" + req.body.mobile
-        req.session.mobile = sendMobile
+
         const email = req.body.email
 
         req.session.user = await userModify.findOne({ email: email })
         const otpSend = Math.floor((Math.random() * 1000000) + 1)
         req.session.sendOtp = otpSend
-        console.log(otpSend)
-        sendOTP(sendMobile, otpSend)
-        res.render('forgetOtp')
+        const send = await sendOTP(email, otpSend)
+            .then(() => res.render('forgetOtp'))
+            .catch(() => res.redirect('/forgetPass'))
+
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -215,31 +233,30 @@ const changePass = async (req, res, next) => {
 }
 const post_SignUp = async (req, res, next) => {
     try {
-        const { mobile, name, email } = req.body
-        console.log(mobile, name, email)
+        const { mobile, name } = req.body
+        console.log(name)
+        let email = req.session.email
+        console.log(email)
+        console.log(mobile)
         let password = await securePassword(req.body.password)
-        const userdata = await userModify.findOne({ email: email })
-        console.log(userdata)
+
         const userinsert = new userModify({
             name: name,
             email: email,
             mobile: mobile,
             password: password
         })
-        if (userdata != null) {
-            req.session.signupmessage = "you already have an account"
-            res.redirect('/register')
-        } else {
-            const result = await userinsert.save()
-            if (result) {
 
-                req.session.login = result
-                res.redirect('/home')
-            } else {
-                req.session.signupmessage = "err occured on saving"
-                res.redirect('/register')
-            }
+        const result = await userinsert.save()
+        if (result) {
+
+            req.session.login = result
+            res.redirect('/home')
+        } else {
+            req.session.signupmessage = "err occured on saving"
+            res.redirect('/register')
         }
+
     } catch (err) {
         console.log(err.message)
         next(err);
@@ -550,11 +567,19 @@ const load_checkout = async (req, res, next) => {
 const post_order = async (req, res, next) => {
     try {
         console.log
-        let { name, house, post, city, state, district, totalprice, mobile, payment } = req.body
+        let { name, house, post, city, state, district, totalprice, mobile, payment, coupon } = req.body
         const user = req.session.login
         const productsIn = await productView.find({})
         const userdata = await userModify.findOne({ _id: user._id })
         let products = userdata.cart
+        if (coupon) {
+            console.log("kjbdgfahfids")
+            await couponModel.findOneAndUpdate({ _id: req.session.couponid }, {
+                $push: {
+                    users: user._id
+                }
+            })
+        }
         for (let i = 0; i < user.cart.length; i++) {
             for (let j = 0; j < productsIn.length; j++) {
                 if (user.cart[i].product == productsIn[j]._id) {
@@ -605,22 +630,20 @@ const post_order = async (req, res, next) => {
                 const options = {
                     amount: totalprice, // amount in paise
                     currency: "INR",
-                    receipt: "order_rcptiifd_11",
+                    receipt: result._id,
                     payment_capture: 1,
                 };
 
                 razorpay.orders.create(options, function (err, order) {
                     if (err) {
                         console.log(order)
-                    } else {
+                    } else { 
                         req.session.orderid = order.id
                         console.log(order);
                         res.json(order)
                     }
                 });
-
             }
-
         } else {
             res.json({ status: false })
         }
@@ -713,16 +736,10 @@ const addToWishList = async (req, res, next) => {
         const check = await userModify.findOne({ _id: id, "wishlist.product": pdt_id })
         if (check == [] || check == null) {
             await userModify.findOneAndUpdate({ _id: id }, {
-                $push: {
-                    wishlist: {
-                        product: pdt_id
-                    }
-                }
-            }, { upsert: true }).then(() => res.json({ status: true }))
+                $push: { wishlist: { product: pdt_id } }
+            }, { upsert: true }).then(() => res.json({ status: true, increment: true }))
                 .catch(() => console.log('not inserted'));
-        } else {
-            res.json({ status: true })
-        }
+        } else { res.json({ status: true, increment: false }) }
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -742,12 +759,88 @@ const removeWishList = async (req, res, next) => {
         next(error)
     }
 }
+const checkCoupon = async (req, res, next) => {
+    try {
+        const { coupon } = req.body
+        const id = req.session.login._id
+        const date = new Date()
+        const couponDetails = await couponModel.findOne({ code: coupon })
+        let couponAllow = true;
+        if (couponDetails) {
+            if (couponDetails.users.length > 0) {
+                for (let i = 0; i < couponDetails.users.length; i++) {
+                    req.session.couponid = couponDetails._id
+                    if (couponDetails.users[i] == id) {
+                        couponAllow = false
+                        break;
+                    }
+                }
+                if (couponAllow) {
+                    if (date < couponDetails.validUpTo && couponDetails.quantity > 0) {
+                        res.json({
+                            status: true,
+                            amount: couponDetails.amount,
+                            couponid: true
+                        })
+                    } else { res.json({ status: false, amount: false, message: "Coupon Expired" }) }
+                } else { res.json({ status: false, amount: false, message: "coupon already Used" }) }
+            } else {
+                if (date < couponDetails.validUpTo && couponDetails.quantity > 0) {
+                    req.session.couponid = couponDetails._id
+                    res.json({
+                        status: true,
+                        amount: couponDetails.amount,
+                        couponid: true
+                    })
+                } else { res.json({ status: false, amount: false, message: "Coupon Exired" }) }
+            }
+        } else {
+            res.json({ status: false, amount: false, message: "Coupon Not Found" })
+        }
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+const emailValidarion = async (req, res, next) => {
+    try {
+        const email = req.body.email
+        if (validateEmail(email) == false) {
+            res.json({
+                status: true,
+                userdata: "Enter Valid email"
+            })
+        } else {
+            res.json({
+                status: true,
+                userdata: false
+            })
+        }
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+const cancelOrder = async (req, res, next) => {
+    try {
+        const orderid = req.body.id
+        const Order = await orderPlace.findOneAndUpdate({ _id: orderid }, {
+            $push: {
+                orderstatus: "order cancelled"
+            }
+        })
+        res.json({status:true})
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
 module.exports = {
+    cancelOrder,
+    emailValidarion,
+    checkCoupon,
     removeWishList,
     addToWishList,
     viewWishList,
-
-
     listOrders,
     conformation,
     verifyPayment,
@@ -756,8 +849,8 @@ module.exports = {
     postNumberForgetPass,
     loadForgotPassword,
     load_SignUp,
-    loadPhoneNumber,
-    postNumber,
+    loadEmailSend,
+    postEmail,
     verifyOtp,
     post_order,
     load_checkout,
@@ -781,5 +874,6 @@ module.exports = {
     post_SignIn,
     post_SignUp,
     l_browse_Product,
-    h_browse_product
+    h_browse_product,
+    EmailCheck
 }

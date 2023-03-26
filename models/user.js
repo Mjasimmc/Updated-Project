@@ -59,12 +59,6 @@ const userSchema = mongoose.Schema({
             product: {
                 type: String,
                 ref: 'product'
-            },
-            quantity: {
-                type: Number,
-            },
-            total:{
-                type:String
             }
         }
     ]

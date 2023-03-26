@@ -26,7 +26,9 @@ app.use(session({ secret: 'User', saveUninitialized: false, resave: false, cooki
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
+// app.use("/",((req,res)=>{
+//     res.render("test")
+// }))
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
 

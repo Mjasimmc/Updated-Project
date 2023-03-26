@@ -29,8 +29,8 @@ router.get('/profile',sessionCheck.logged,adminController.loadprofile)
 
 // viewing and user controlling
 router.get('/userlist',sessionCheck.logged,adminController.userlist)    
-router.get('/block/:id',sessionCheck.logged,adminController.block)
-router.get('/unblock/:id',sessionCheck.logged,adminController.unblock)
+router.post('/block',sessionCheck.logged,adminController.block)
+router.post('/unblock',sessionCheck.logged,adminController.unblock)
 
 
 // products adding
@@ -41,8 +41,9 @@ router.post('/addproduct',sessionCheck.logged,upload.array('image',10),adminCont
 router.get('/productlist',sessionCheck.logged,adminController.productlist)
 router.get('/edit-product/:id',sessionCheck.logged,adminController.loadEditProduct)
 router.post('/update-product',sessionCheck.logged,adminController.updateProduct)
-router.get('/deleteproduct/:id',sessionCheck.logged,adminController.deleteproduct)
-
+router.post('/deleteproduct',sessionCheck.logged,adminController.deleteproduct)
+router.post("/undodelete",sessionCheck.logged,adminController.undodeleteproduct)
+router.post("/removeimage",sessionCheck.logged,adminController.removeImage)
 // category
 router.get('/categorylist',sessionCheck.logged,adminController.categorylist)
 router.get('/category',sessionCheck.logged,adminController.loadcategory)
@@ -53,5 +54,17 @@ router.get('/orderList',sessionCheck.logged,adminController.loadOrderList)
 
 router.get('/orderList/:id',sessionCheck.logged,adminController.viewOrder)
 
+router.get('/coupon-list',sessionCheck.logged,adminController.listCoupon)
+router.get('/addcoupon',sessionCheck.logged,adminController.loadAddCoupon)
+router.post('/addcoupon',sessionCheck.logged,adminController.postAddCoupon) 
+router.post("/updateOrder",sessionCheck.logged,adminController.updateOrder)
+
+router.post("/addImage",sessionCheck.logged,upload.array('image',10),adminController.addImage)
+
+router.get("/edit-category/:id",sessionCheck.logged,adminController.loadCategoryedit)
+router.post("/updatecategory",sessionCheck.logged,adminController.updateCategory)
+
+router.post("/delete-category",sessionCheck.logged,adminController.deleteCategory)
+router.post("/undo-Category",sessionCheck.logged,adminController.undoCategory)
 
 module.exports = router;

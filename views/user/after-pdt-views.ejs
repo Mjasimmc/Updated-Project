@@ -60,23 +60,16 @@
 												onclick="wishincrement('<%= prdetails._id %>')">
 												Add to Wishlist
 											</button>
-											<% let product = false
-                                    	for( let ind = 0; ind < user.wishlist.length; ind++ ) { 
-                                        	if (user.cart[ind].product == prdetails._id) {
-                                            product = true }  } %>
-                                     	<% if (product == true) { %>
-										<a href="/view-cart" id="goto<%= index %>" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
-											Go to cart
-										</a>
-                                      <% } else { %>
-                                        <button onclick="increment('<%= prdetails._id %>')"
-                                            
-                                            class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
-                                            Add to cart
-                                        </button>
-                                     <% } %>
-											
-											
+
+
+
+											<button onclick="increment('<%= prdetails._id %>')"
+												class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail">
+												Add to cart
+											</button>
+
+
+
 										</div>
 										<script>
 											function increment(pdt_id) {
@@ -93,18 +86,33 @@
 													}
 												});
 											}
+											function incrementCartCount() {
+												let cartIcon = document.querySelector('.icon-header-noti');
+												let currentValue = parseInt(cartIcon.getAttribute('data-notify'));
+												currentValue += 1;
+												cartIcon.setAttribute('data-notify', currentValue);
+												let cartIconMob = document.getElementById('carticonincrement');
+												cartIconMob.setAttribute('data-notify', currentValue);
+											}
 											function wishincrement(pdt_id, num) {
-
 												$.ajax({
 													url: "/add-wishlist",
 													method: 'POST',
 													data: { pdt_id: pdt_id },
 													encoded: true,
 													success: function (response) {
-														console.log("ok")
-														
+														if (response.increment) {
+															incrementWishlistCount()
+														}
 													}
 												});
+											}
+
+											function incrementWishlistCount() {
+												let cartIcon = document.getElementById("wishlisticon");
+												let currentValue = parseInt(cartIcon.getAttribute('data-notify'));
+												currentValue += 1;
+												cartIcon.setAttribute('data-notify', currentValue);
 											}
 										</script>
 									</div>
@@ -170,11 +178,7 @@
 										fringilla sit amet. Ut in blandit ipsum. Quisque luctus dui at ante aliquet, in
 										hendrerit lectus interdum. Morbi elementum sapien rhoncus pretium maximus. Nulla
 										lectus enim, cursus et elementum sed, sodales vitae eros. Ut ex quam, porta
-										consequat interdum in, faucibus eu velit. Quisque rhoncus ex ac libero varius
-										molestie. Aenean tempor sit amet orci nec iaculis. Cras sit amet nulla libero.
-										Curabitur dignissim, nunc nec laoreet consequat, purus nunc porta lacus, vel
-										efficitur tellus augue in ipsum. Cras in arcu sed metus rutrum iaculis. Nulla
-										non tempor erat. Duis in egestas nunc.
+										consequat
 									</p>
 								</div>
 							</div>

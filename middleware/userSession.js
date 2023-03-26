@@ -27,9 +27,9 @@ const homeallow = async (req,res,next)=>{
         next(error)
     }
 }
-const phonecheck = async(req,res,next)=>{
+const emailcheck = async(req,res,next)=>{
     try {
-        if(req.session.mobile){
+        if(req.session.email){
             next()
         }else{
             res.redirect('/register')
@@ -38,8 +38,22 @@ const phonecheck = async(req,res,next)=>{
         console.log(error.message)
     }
 }
+const cartCheck = async (req,res,next)=>{
+    try {
+        if(req.session.login.cart.length > 0 ){
+            next()
+        }else{
+            res.redirect("/view-cart")
+        }
+        
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
 module.exports = {
     result,
     homeallow,
-    phonecheck
+    emailcheck,
+    cartCheck
 }

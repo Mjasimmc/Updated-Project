@@ -1,7 +1,7 @@
 <%- include('../layout/header.ejs') %>
     <%- include('../layout/after-login.ejs') %>
 
-        <div class="container" id="nocartdata" style="display: none;">
+        <div class="container m-5" id="nocartdata" style="display: none;">
             <h1>Your Cart is Empty</h1>
             <a href="/shop">
                 <div class="col-3 flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
@@ -10,10 +10,11 @@
             </a>
         </div>
         <% if (cartdata.cart.length==0) { %>
-            <div class="container">
+            <div class="container m-5">
                 <h1>Your Cart is Empty</h1>
                 <a href="/shop">
-                    <div class="col-3 flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
+                    <div
+                        class="col-3 flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
                         Add products
                     </div>
                 </a>
@@ -51,10 +52,9 @@
                                                     <td class="column-2">
                                                         <%= element.product.name %>
                                                     </td>
-                                                    <td class="column-3">$
-                                                        <div id="price">
+                                                    <td class="column-3">$<span id="price">
                                                             <%= element.product.price %>
-                                                        </div>
+                                                        </span>
                                                     </td>
 
                                                     <td class="column-4">
@@ -136,34 +136,15 @@
                                     <h4 class="mtext-109 cl2 p-b-30">
                                         Cart Totals
                                     </h4>
-
                                     <div class="flex-w flex-t bor12 p-b-13">
                                         <div class="size-208">
                                             <span class="stext-110 cl2">
                                                 Subtotal:
                                             </span>
                                         </div>
-
                                         <div class="size-209">
                                             <span class="mtext-110 cl2" id="subTotal"></span>
                                         </div>
-
-
-
-                                    </div>
-                                    <div class="flex-w flex-t bor12 p-b-13">
-                                        <div class="size-208">
-                                            <span class="stext-110 cl2">
-                                                Shipping:
-                                            </span>
-                                        </div>
-
-                                        <div class="size-209">
-                                            <span class="mtext-110 cl2">$50</span>
-                                        </div>
-
-
-
                                     </div>
 
                                     <div class="flex-w flex-t p-t-27 p-b-33">
@@ -172,32 +153,22 @@
                                                 Total:
                                             </span>
                                         </div>
-
                                         <div class="size-209 p-t-1">
                                             <span class="mtext-110 cl2" id="TotalAmount">
-
                                             </span>
                                         </div>
                                     </div>
-
-
                                     <a href="/checkout"
                                         class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
                                         Proceed to Checkout
                                     </a>
                                 </div>
                             </div>
-
-
-
-
                         </div>
-
-
                     </div>
                 </form>
                 <% } %>
-
+                    
                     <script>
                         function updatePrice() {
                             let rows = document.querySelectorAll(".table_row");
@@ -207,20 +178,15 @@
                                 let price = parseFloat(rows[i].querySelector("#price").textContent.replace('$', ''));
                                 let subtotal = quantity * price;
                                 rows[i].querySelector("#priceAmount").textContent = "$" + subtotal.toFixed(0);
-
                                 totalPrice += subtotal
-
                             }
                             let subTotalElement = document.getElementById("subTotal");
                             let TotalElement = document.getElementById("TotalAmount");
                             if (subTotalElement == 0) {
                                 document.getElementById("nocartdata").style.display = ""
                             }
-
-
                             subTotalElement.innerHTML = "$" + totalPrice.toFixed(0);
                             TotalElement.innerHTML = "$" + (totalPrice + 50)
-
                         }
                         function decrementCartCount(num) {
                             const myElement = document.getElementById(`${num}`);
@@ -228,11 +194,9 @@
                             var cartIcon = document.querySelector('.icon-header-noti');
                             var currentValue = parseInt(cartIcon.getAttribute('data-notify'));
                             currentValue -= 1;
-                            if(currentValue == 0){
-                               
-                                       document.getElementById('nocartdata').style.display = ""
-                                       document.getElementById('formlook').style.display = "none"
-                                   
+                            if (currentValue == 0) {
+                                document.getElementById('nocartdata').style.display = ""
+                                document.getElementById('formlook').style.display = "none"
                             }
                             cartIcon.setAttribute('data-notify', currentValue);
                         }
@@ -259,31 +223,48 @@
                             let value = parseInt(document.getElementById(`countnum${num}`).value)
                             if (value > 1) {
                                 document.getElementById(`countnum${num}`).value = value - 1
-
                                 $.ajax({
                                     url: "/remove-cart",
                                     method: 'POST',
                                     data: { pdt_id: pdt_id },
                                     encoded: true,
                                     success: function (response) {
-
                                         updatePrice()
                                     }
                                 });
                             }
                         }
                         function remove(pdt_id, num) {
-                            document.getElementById(`countnum${num}`).value = 0
-                            $.ajax({
-                                url: "/deleteProductcart",
-                                method: 'POST',
-                                data: { pdt_id: pdt_id },
-                                encoded: true,
-                                success: function (response) {
-                                    decrementCartCount(num)
-                                    updatePrice() 
-                                }
-                            });
+                            const swalWithBootstrapButtons = Swal.mixin({
+                                customClass: {
+                                    confirmButton: 'btn btn-success',
+                                    cancelButton: 'btn btn-danger'
+                                }, buttonsStyling: true
+                            })
+                            swalWithBootstrapButtons.fire({
+                                title: 'Are you sure?',text: "You won't be able to revert this!",
+                                icon: 'warning',showCancelButton: true,
+                                confirmButtonText: 'Yes, delete it!',cancelButtonText: 'No, cancel!',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    document.getElementById(`countnum${num}`).value = 0
+                                    $.ajax({
+                                        url: "/deleteProductcart",
+                                        method: 'POST',
+                                        data: { pdt_id: pdt_id },
+                                        encoded: true,
+                                        success: function (response) {
+                                            decrementCartCount(num)
+                                            updatePrice()
+                                        }
+                                    }).then(()=>{
+                                        swalWithBootstrapButtons.fire('Deleted!','Product has been removed.','success')
+                                    })
+                                } else if (result.dismiss === Swal.DismissReason.cancel ) 
+                                {swalWithBootstrapButtons.fire('Cancelled','Product is not removed','error')}
+                            })
+                            
 
                         }
                     </script>

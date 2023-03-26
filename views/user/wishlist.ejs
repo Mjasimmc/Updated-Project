@@ -1,17 +1,15 @@
 <%- include('../layout/header.ejs') %>
     <%- include('../layout/after-login.ejs') %>
     
-        <div class="container">
+    <% if (user.wishlist.length > 0) { %>
+        <div class="container" id="tablegone">
             <div class="row">
-                <% if (user.wishlist.length > 0) { %>
-
-                 
-                <table class="table-shopping-cart" id="tablegone">
+                <table class="table-shopping-cart" >
                     <tr class="table_head">
-                        <th class="column-1">Product</th>
-                        <th class="column-2"></th>
-                        <th class="column-3">Price</th>
-                        <th class="column-5">Remove</th>
+                        <th class="">Product</th>
+                        <th class=""></th>
+                        <th class="">Price</th>
+                        <th class="">Remove</th>
                     </tr>
 
                     <% user.wishlist.forEach((element,index)=> { %>
@@ -41,32 +39,45 @@
                         </tr>
                         <% }) %>
                 </table>
-                <% } else { %>
-                  <h1 class="m-5">Your Wish list is empty</h1>
-                    <% } %>
+                
             </div>
             <!-- /remove-wishlist -->
-            <script>
-                function wishremove(pdt_id,num) {
-                    $.ajax({
-                        url: "/remove-wishlist",
-                        method: 'POST',
-                        data: { pdt_id: pdt_id },
-                        encoded: true,
-                        success: function (response) {
-                            console.log("ok")
-                            document.getElementById(`button${num}`).style.display = "none"
-                            
-                        }
-                    });
-                }
-            </script>
+            
 
         </div>
-
-
-
-
+        
+        <% } else { %>
+            <div class="container">
+                <h1 class="m-5">Your Wish list is empty</h1>
+            </div>
+            <% } %>
+            <div class="container">
+                <h1 class="m-5" id="emptywish" style="display: none;">Your Wish list is empty</h1>
+            </div>
+        <script>
+            function wishremove(pdt_id,num) {
+                $.ajax({
+                    url: "/remove-wishlist",
+                    method: 'POST',
+                    data: { pdt_id: pdt_id },
+                    encoded: true,
+                    success: function (response) {
+                        console.log("ok")
+                        document.getElementById(`button${num}`).style.display = "none"
+                        decrement()   
+                    }
+                });
+            }
+            function decrement(){
+                var cartIcon = document.getElementById("wishlisticon");
+                var currentValue = parseInt(cartIcon.getAttribute('data-notify'));
+                currentValue -= 1;
+                cartIcon.setAttribute('data-notify', currentValue);
+                if(currentValue == 0){
+                    document.getElementById("emptywish").style.display = ""
+                }
+            }
+        </script>
 
 
         <%- include('../layout/footer.ejs') %>

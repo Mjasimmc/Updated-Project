@@ -1,7 +1,10 @@
 const mongoose = require('mongoose')
 
 const couponSchema = mongoose.Schema({
-    code:{
+    name:{
+        type:String,
+        required:true
+    },code:{
         type:String,
         required:true
     },
@@ -21,7 +24,11 @@ const couponSchema = mongoose.Schema({
         {
             type:String
         }
-    ]
+    ],
+    quantity:{
+        type:Number,
+        required:true
+    }
     
 })
 module.exports = mongoose.model('coupon',couponSchema);

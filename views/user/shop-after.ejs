@@ -81,13 +81,13 @@
 
 
 									<div class="block2-txt-child2 flex-r p-t-3">
-										<a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
-											<img class="icon-heart1 dis-block trans-04"
-												src="userTemplate/images/icons/icon-heart-01.png" alt="ICON">
-											<img class="icon-heart2 dis-block trans-04 ab-t-l"
-												src="userTemplate/images/icons/icon-heart-02.png" alt="ICON">
-										</a>
-									</div>
+                                        <button onclick="wishincrement('<%= element._id %>')" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
+                                            <img class="icon-heart1 dis-block trans-04"
+                                                src="userTemplate/images/icons/icon-heart-01.png" alt="ICON">
+                                            <img class="icon-heart2 dis-block trans-04 ab-t-l"
+                                                src="userTemplate/images/icons/icon-heart-02.png" alt="ICON">
+                                        </button>
+                                    </div>
 									<% let product = false
                                     for( let index = 0; index < user.cart.length; index++ ) { 
                                         
@@ -141,16 +141,60 @@
 				success: function (response) {
 					console.log("ok")
 					if (response.increment) {
+						Swal.fire({
+							position: 'top-end',
+							icon: 'success',
+							title: 'Product is added to cart',
+							showConfirmButton: false,
+							timer: 1000	
+						})
 						incrementCartCount()
 					}
 				}
 			});
 		}
 		function incrementCartCount() {
-			var cartIcon = document.querySelector('.icon-header-noti');
-			var currentValue = parseInt(cartIcon.getAttribute('data-notify'));
+			let cartIcon = document.querySelector('.icon-header-noti');
+			let currentValue = parseInt(cartIcon.getAttribute('data-notify'));
 			currentValue += 1;
 			cartIcon.setAttribute('data-notify', currentValue);
+			let cartIconMob = document.getElementById('carticonincrement');
+            cartIconMob.setAttribute('data-notify', currentValue);
 		}
+		function wishincrement(pdt_id, num) {
+            $.ajax({
+                url: "/add-wishlist",
+                method: 'POST',
+                data: { pdt_id: pdt_id },
+                encoded: true,
+                success: function (response) {
+                    if(response.increment){
+						Swal.fire({
+							position: 'top-end',
+							icon: 'success',
+							title: 'Product is Added to Wishlist',
+							showConfirmButton: false,
+							timer: 1000	
+						})
+                        incrementWishlistCount()
+                	}else{
+						Swal.fire({
+							position: 'top-end',
+							icon: 'info',
+							title: 'Product is already added to Wishlist',
+							showConfirmButton: false,
+							timer: 1000
+						})
+					}
+				}
+            });
+        }
+        function incrementWishlistCount() {
+            let cartIcon = document.getElementById("wishlisticon");
+            let currentValue = parseInt(cartIcon.getAttribute('data-notify'));
+            currentValue += 1;
+            cartIcon.setAttribute('data-notify', currentValue);
+			
+        }
 	</script>
 		<%- include('../layout/footer.ejs') %>

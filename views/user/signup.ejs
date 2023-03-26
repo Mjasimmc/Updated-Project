@@ -1,42 +1,61 @@
 <%- include('../layout/header.ejs') %>
     <%- include('../layout/before-login.ejs') %>
 
-
         <head>
             <link rel="stylesheet" href="\stylesheets\signIn.css">
         </head>
-        <!--================Login Box Area =================-->
-
         <div class="wrapper fadeInDown">
             <div id="formContent">
-                <!-- Tabs Titles -->
-
-                <!-- Icon -->
-                <!-- Login Form -->
-
-                <form class="p-t-15" method="post" action="/registerUser">
-                    <% if (alertMessage) { %>
-                        <div class="alert alert-success m-5" role="alert">
-                            <%= alertMessage %>
-                        </div>
-                        <% } %>
-
-                            <h4>Login Your Account</h4>
-                            <input type="text" class="fadeIn second" name="name" placeholder="Username" required>
-                            <input type="email" class="fadeIn third" name="email" placeholder="Email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
-                            <input type="text" name="mobile" value="<%= mobile %>" style="display: none;">
-                            <input type="password" class="fadeIn fourth" name="password" placeholder="Password" required>
-                            <input type="password" class="fadeIn fifth" name="repassword" placeholder="Re-Password"
-                                required>
-                            <input type="submit" class="fadeIn fourth" value="Sign Up">
+                <form class="p-t-15" method="post" id="form" action="/registerUser">
+                    <h4>Login Your Account</h4>
+                    <input type="text" id="username" class="fadeIn second" name="name" placeholder="Username" required
+                        title="Please enter a valid name.">
+                    <input type="email" class="fadeIn third" value="<%= email %>" id="email" name="email"
+                        placeholder="Email" style="display: none;">
+                    <input type="tel" id="mobile" name="mobile" placeholder="Enter Mobile" max="" required>
+                    <input type="password" class="fadeIn fourth" minlength="6" id="password" name="password" placeholder="Password" required>
+                    <input type="password" class="fadeIn fifth" id="repassword" oninput="validatePassowrd()" name="repassword" placeholder="Re-Password" required>
+                    <p class="alert text-danger" id="passMessage"></p>
+                    <input type="submit" class="fadeIn fourth" value="Sign Up">
                 </form>
-
-
             </div>
         </div>
-        <style>
+        <script>
+            let pass = false
+            function validateName(name) {
+                var regex = /^[A-Za-z]+$/;
+                if (regex.test(name)) {
+                    return true
+                } else {
+                    return false;
+                }
+            }
+            function validatePassowrd(){
+                const password = document.getElementById("password").value
+                const repassword = document.getElementById("repassword").value
+                if(password == repassword ){
+                    document.getElementById("passMessage").innerHTML = ""
+                    pass = true
+                }else{
+                    document.getElementById("passMessage").innerHTML = "Password is not match"
+                    pass = false
+                }
+            }
 
-            
+            const form = document.getElementById('form');
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                let name = document.getElementById("username").value
+                const result = validateName(name)
+                console.log(result + "nothign");
+                if (result ==false) {
+                    alert("Enter Valid Name")
+                } else if(pass == false) {
+                    alert("Please match Your password")
+                }
+            })
+        </script>
+        <style>
             input {
                 background-color: #f6f6f6;
                 border: none;
