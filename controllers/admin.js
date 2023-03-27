@@ -75,7 +75,6 @@ const block = async (req, res, next) => {
     try {
         const userid = req.body.user
         const user = await UserModify.findOneAndUpdate({ _id: userid }, { $set: { blockuser: true } })
-        console.log(user);
         res.json({status:true})
     } catch (error) {
         console.log(error.message)

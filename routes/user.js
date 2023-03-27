@@ -77,6 +77,6 @@ router.post('/remove-wishlist', sessioncheck.homeallow, block, userController.re
 
 router.post('/checkCoupon', sessioncheck.homeallow, block, userController.checkCoupon)
 router.post('/cancel-order',sessioncheck.homeallow,block,userController.cancelOrder)
-
+router.post("/checkout-adress",sessioncheck.homeallow,block,userController.addressOnCheckout)
 
 module.exports = router;
