@@ -2,7 +2,7 @@ const productView = require('../models/product')
 
 const search_result = async (req,res,next)=>{
     try {
-        const products = await productView.find({delete:0})
+        const products = await productView.find({delete:0}).populate("category")
         req.session.products = products ;
         next();
     } catch (error) {

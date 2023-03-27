@@ -9,7 +9,7 @@ const couponModel = require('../models/coupon')
 const path = require('path');
 const { parse } = require('path');
 require('dotenv').config({ path: __dirname + '../config/.env' })
-const postlogin = async (req, res, next) => {
+const post_login = async (req, res, next) => {
     try {
         const admindata = await adminDB.findOne()
         const email = admindata.email
@@ -33,7 +33,7 @@ const postlogin = async (req, res, next) => {
         next(error)
     }
 }
-const loadSignIn = async (req, res, next) => {
+const load_sign_in = async (req, res, next) => {
     try {
         alertMessage = req.session.adminloginmessage;
         req.session.adminloginmessage = ""
@@ -44,7 +44,7 @@ const loadSignIn = async (req, res, next) => {
         next(error)
     }
 }
-const loadHome = async (req, res, next) => {
+const load_home = async (req, res, next) => {
     try {
         const orders = await orderModel.find({}).sort({}).populate("user")
         res.render('home', { orders })
@@ -62,7 +62,7 @@ const logout = async (req, res, next) => {
         next(error)
     }
 }
-const userlist = async (req, res, next) => {
+const user_list = async (req, res, next) => {
     try {
         const users = await UserModify.find({}).sort({ name: 1 })
         res.render('userlist', { users })
@@ -81,7 +81,7 @@ const block = async (req, res, next) => {
         next(error)
     }
 }
-const unblock = async (req, res, next) => {
+const un_block = async (req, res, next) => {
     try {
         const userid = req.body.user
         await UserModify.findOneAndUpdate({ _id: userid }, { $set: { blockuser: false } })
@@ -92,7 +92,7 @@ const unblock = async (req, res, next) => {
         next(error)
     }
 }
-const loadinsertproduct = async (req, res, next) => {
+const   load_insert_product = async (req, res, next) => {
     try {
         const category = await categorydata.find({ delete: 0 })
         req.session.category = category._id;
@@ -102,7 +102,7 @@ const loadinsertproduct = async (req, res, next) => {
         next(error)
     }
 }
-const loadcategory = async (req, res, next) => {
+const load_category = async (req, res, next) => {
     try {
         res.render('addcategory')
     } catch (error) {
@@ -110,7 +110,7 @@ const loadcategory = async (req, res, next) => {
         next(error)
     }
 }
-const insertProduct = async (req, res, next) => {
+const insert_product = async (req, res, next) => {
     try {
         const product = new productModidy({
             name: req.body.name,
@@ -121,7 +121,7 @@ const insertProduct = async (req, res, next) => {
             stock: req.body.stock
         })
         const categoryid = req.body.fruits;
-        await categorydata.findOneAndUpdate({ category: categoryid }, { $inc: { products: 1 } })
+        await categorydata.findOneAndUpdate({ _id: categoryid }, { $inc: { products: 1 } })
         await product.save()
         res.redirect('/admin/productlist')
     } catch (error) {
@@ -129,7 +129,7 @@ const insertProduct = async (req, res, next) => {
         next(error)
     }
 }
-const insertCategory = async (req, res, next) => {
+const insert_category = async (req, res, next) => {
     try {
         const category = req.body.name;
         const product = new categorydata({
@@ -152,7 +152,7 @@ const insertCategory = async (req, res, next) => {
         next(error)
     }
 }
-const productlist = async (req, res, next) => {
+const product_list = async (req, res, next) => {
     try {
         let products = await productModidy.find()
         res.render('productlist', { products })
@@ -162,7 +162,7 @@ const productlist = async (req, res, next) => {
         next(error)
     }
 }
-const deleteproduct = async (req, res, next) => {
+const delete_product = async (req, res, next) => {
 
     try {
         const userid = req.body.id
@@ -183,7 +183,7 @@ const deleteproduct = async (req, res, next) => {
         next(error)
     }
 }
-const undodeleteproduct = async (req, res, next) => {
+const undo_delete_product = async (req, res, next) => {
 
     try {
         const userid = req.body.id
@@ -205,15 +205,16 @@ const undodeleteproduct = async (req, res, next) => {
         next(error)
     }
 }
-const loadprofile = async (req, res, next) => {
+const load_profile = async (req, res, next) => {
     try {
-        res.render('profile')
+        const admin = await adminDB.findOne({})
+        res.render('profile',{admin})
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const categorylist = async (req, res, next) => {
+const category_list = async (req, res, next) => {
     try {
         alertMessage = req.session.categorymessage
         req.session.categorymessage = ""
@@ -224,7 +225,7 @@ const categorylist = async (req, res, next) => {
         next(error)
     }
 }
-const loadEditProduct = async (req, res, next) => {
+const load_edit_product = async (req, res, next) => {
     try {
         const productId = req.params.id
         const product = await productModidy.findOne({ _id: productId })
@@ -235,7 +236,7 @@ const loadEditProduct = async (req, res, next) => {
         next(error)
     }
 }
-const updateProduct = async (req, res, next) => {
+const update_product = async (req, res, next) => {
     try {
 
         const name = req.body.name
@@ -264,7 +265,7 @@ const updateProduct = async (req, res, next) => {
         next(error)
     }
 }
-const loadOrderList = async (req, res, next) => {
+const load_order_list = async (req, res, next) => {
     try {
         const orders = await orderModel.find({}).populate("user")
         res.render('orderlist', { orders })
@@ -273,7 +274,7 @@ const loadOrderList = async (req, res, next) => {
         next(error)
     }
 }
-const viewOrder = async (req, res, next) => {
+const view_order = async (req, res, next) => {
     try {
         const OrderId = req.params.id
         const order = await orderModel.findOne({ _id: OrderId }).populate("products.product")
@@ -284,7 +285,7 @@ const viewOrder = async (req, res, next) => {
         next(error)
     }
 }
-const listCoupon = async (req, res, next) => {
+const list_coupon = async (req, res, next) => {
     try {
         const couponList = await couponModel.find({})
         res.render("coupon-list", { couponList })
@@ -293,7 +294,7 @@ const listCoupon = async (req, res, next) => {
         next(error)
     }
 }
-const loadAddCoupon = async (req, res, next) => {
+const load_add_coupon = async (req, res, next) => {
     try {
         res.render("add-coupon")
     } catch (error) {
@@ -301,7 +302,7 @@ const loadAddCoupon = async (req, res, next) => {
         next(error)
     }
 }
-const postAddCoupon = async (req, res, next) => {
+const post_add_coupon = async (req, res, next) => {
     try {
         let { name, code, date, amount, quantity } = req.body
         date = parseInt(date)
@@ -322,7 +323,7 @@ const postAddCoupon = async (req, res, next) => {
         next(error)
     }
 }
-const updateOrder = async (req, res, next) => {
+const update_order = async (req, res, next) => {
     try {
         const { orderid, name } = req.body
         const Order = await orderModel.findOneAndUpdate({ _id: orderid }, {
@@ -336,7 +337,7 @@ const updateOrder = async (req, res, next) => {
         next(error)
     }
 }
-const removeImage = async (req, res, next) => {
+const remove_image = async (req, res, next) => {
     try {
         const { id, image } = req.body
         const product = await productModidy.findOne({_id:id})
@@ -353,7 +354,7 @@ const removeImage = async (req, res, next) => {
         next(error)
     }
 }
-const addImage = async (req, res, next) => {
+const add_image = async (req, res, next) => {
     try {
         const { id } = req.body
        
@@ -369,7 +370,7 @@ const addImage = async (req, res, next) => {
         next(error)
     }
 }
-const loadCategoryedit = async(req,res,next)=>{
+const load_category_edit = async(req,res,next)=>{
     try {
         const id = req.params.id
         const categorydetails = await categorydata.findOne({_id:id});
@@ -379,7 +380,7 @@ const loadCategoryedit = async(req,res,next)=>{
         next(error)
     }
 }
-const updateCategory = async (req,res,next)=>{
+const update_category = async (req,res,next)=>{
     try {
         const category = req.body.id
         const name = req.body.name
@@ -397,7 +398,7 @@ const updateCategory = async (req,res,next)=>{
         next(error)
     }
 }
-const deleteCategory = async(req,res,next)=>{
+const delete_category = async(req,res,next)=>{
     try {
         const category = req.body.name
         const detiails = await categorydata.findOneAndUpdate({category:category},{
@@ -414,7 +415,7 @@ const deleteCategory = async(req,res,next)=>{
         next(error)
     }
 }
-const undoCategory = async(req,res,next)=>{
+const undo_category = async(req,res,next)=>{
     try {
         const category = req.body.name
         const detiails = await categorydata.findOneAndUpdate({category:category},{
@@ -431,44 +432,46 @@ const undoCategory = async(req,res,next)=>{
         next(error)
     }
 }
+
+
 module.exports = {
-    undoCategory,
-    deleteCategory,
-    updateCategory,
-    loadCategoryedit,
-    addImage,
-    updateOrder,
-    removeImage,
+    undo_category,
+    delete_category,
+    update_category,
+    load_category_edit,
+    add_image,
+    update_order,
+    remove_image,
 
-    postAddCoupon,
-    loadAddCoupon,
-    listCoupon,
-    viewOrder,
-    loadOrderList,
+    post_add_coupon,
+    load_add_coupon ,
+    list_coupon,
+    view_order,
+    load_order_list,
 
-    updateProduct,
-    loadEditProduct,
+    update_product,
+    load_edit_product,
 
-    loadSignIn,
-    loadHome,
+    load_sign_in,
+    load_home,
     logout,
-    postlogin,
+    post_login,
 
 
-    userlist,
+    user_list,
     block,
-    unblock,
+    un_block,
 
-    loadinsertproduct,
-    insertProduct,
-    productlist,
-    deleteproduct,
-    undodeleteproduct,
+    load_insert_product,
+    insert_product,
+    product_list,
+    delete_product,
+    undo_delete_product,
 
-    loadprofile,
+    load_profile,
 
-    loadcategory,
-    insertCategory,
-    categorylist
+    load_category,
+    insert_category,
+    category_list
 
 }

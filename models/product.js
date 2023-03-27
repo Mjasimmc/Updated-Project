@@ -20,11 +20,20 @@ const productSchema = mongoose.Schema({
     },category:{
         type:String,
         ref:'category',
-        required:true
+        
     },
     delete:{
         type:Number,
         default:0
+    },
+    offer:{
+        status:{
+            type:Boolean,
+            default:false
+        },
+        amount:{
+            price:Number
+        }
     }
     
 })
