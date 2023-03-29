@@ -75,7 +75,7 @@ const block = async (req, res, next) => {
     try {
         const userid = req.body.user
         const user = await UserModify.findOneAndUpdate({ _id: userid }, { $set: { blockuser: true } })
-        res.json({status:true})
+        res.json({ status: true })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -85,14 +85,14 @@ const un_block = async (req, res, next) => {
     try {
         const userid = req.body.user
         await UserModify.findOneAndUpdate({ _id: userid }, { $set: { blockuser: false } })
-        res.json({status:true})
+        res.json({ status: true })
 
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const   load_insert_product = async (req, res, next) => {
+const load_insert_product = async (req, res, next) => {
     try {
         const category = await categorydata.find({ delete: 0 })
         req.session.category = category._id;
@@ -208,7 +208,7 @@ const undo_delete_product = async (req, res, next) => {
 const load_profile = async (req, res, next) => {
     try {
         const admin = await adminDB.findOne({})
-        res.render('profile',{admin})
+        res.render('profile', { admin })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -340,14 +340,14 @@ const update_order = async (req, res, next) => {
 const remove_image = async (req, res, next) => {
     try {
         const { id, image } = req.body
-        const product = await productModidy.findOne({_id:id})
-        if(product.image.length > 1){
+        const product = await productModidy.findOne({ _id: id })
+        if (product.image.length > 1) {
 
             const result = await productModidy.findOneAndUpdate({ _id: id },
-                { $pull: { image: image} })
-            res.json({status:true})
-        }else{
-            res.json({status:false})
+                { $pull: { image: image } })
+            res.json({ status: true })
+        } else {
+            res.json({ status: false })
         }
     } catch (error) {
         console.log(error.message)
@@ -357,37 +357,37 @@ const remove_image = async (req, res, next) => {
 const add_image = async (req, res, next) => {
     try {
         const { id } = req.body
-       
+
         const result = await productModidy.findOneAndUpdate(
             { _id: id },
             { $push: { image: req.files.map(file => file.filename) } },
             { new: true } // return the updated document instead of the original document
-          );
-           res.redirect(`/admin/edit-product/${id}`)
-        
+        );
+        res.redirect(`/admin/edit-product/${id}`)
+
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const load_category_edit = async(req,res,next)=>{
+const load_category_edit = async (req, res, next) => {
     try {
         const id = req.params.id
-        const categorydetails = await categorydata.findOne({_id:id});
-        res.render("edit-category",{categorydetails})
+        const categorydetails = await categorydata.findOne({ _id: id });
+        res.render("edit-category", { categorydetails })
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const update_category = async (req,res,next)=>{
+const update_category = async (req, res, next) => {
     try {
         const category = req.body.id
         const name = req.body.name
-        console.log(category,name);
-        const detiails = await categorydata.findOneAndUpdate({_id:category},{
-            $set:{
-                category:name
+        console.log(category, name);
+        const detiails = await categorydata.findOneAndUpdate({ _id: category }, {
+            $set: {
+                category: name
             }
         })
         console.log(detiails)
@@ -398,34 +398,34 @@ const update_category = async (req,res,next)=>{
         next(error)
     }
 }
-const delete_category = async(req,res,next)=>{
+const delete_category = async (req, res, next) => {
     try {
         const category = req.body.name
-        const detiails = await categorydata.findOneAndUpdate({category:category},{
-            $set:{
-                delete:1
+        const detiails = await categorydata.findOneAndUpdate({ category: category }, {
+            $set: {
+                delete: 1
             }
         })
         console.log(detiails)
         res.json({
-            status:true
+            status: true
         })
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const undo_category = async(req,res,next)=>{
+const undo_category = async (req, res, next) => {
     try {
         const category = req.body.name
-        const detiails = await categorydata.findOneAndUpdate({category:category},{
-            $set:{
-                delete:0
+        const detiails = await categorydata.findOneAndUpdate({ category: category }, {
+            $set: {
+                delete: 0
             }
         })
         console.log(detiails)
         res.json({
-            status:true
+            status: true
         })
     } catch (error) {
         console.log(error.message)
@@ -433,8 +433,44 @@ const undo_category = async(req,res,next)=>{
     }
 }
 
-
+const disable_coupon = async (req, res, next) => {
+    try {
+        const couponid = req.body.id
+        const result = await couponModel.findOneAndUpdate(
+            { _id: couponid },
+            {
+                disable:true
+            }
+        ).then(()=>{
+            res.json({status:true})
+        })
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+const enable_coupon = async (req, res, next) => {
+    try {
+        const couponid = req.body.id
+        const result = await couponModel.findOneAndUpdate(
+            { _id: couponid },
+            {
+                disable:false
+            }
+        ).then(()=>{
+            res.json({status:true})
+        })
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
 module.exports = {
+
+    disable_coupon,
+    enable_coupon,
+
+
     undo_category,
     delete_category,
     update_category,
@@ -444,7 +480,7 @@ module.exports = {
     remove_image,
 
     post_add_coupon,
-    load_add_coupon ,
+    load_add_coupon,
     list_coupon,
     view_order,
     load_order_list,

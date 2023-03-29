@@ -79,4 +79,6 @@ router.post('/checkCoupon', sessioncheck.homeallow, block, userController.check_
 router.post('/cancel-order',sessioncheck.homeallow,block,userController.cancel_order)
 router.post("/checkout-adress",sessioncheck.homeallow,block,userController.address_on_checkout)
 
+router.post("/walletCheck",sessioncheck.homeallow,block,userController.wallet_check)
+
 module.exports = router;

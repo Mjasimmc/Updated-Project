@@ -67,4 +67,7 @@ router.post("/updatecategory",sessionCheck.logged,adminController.update_categor
 router.post("/delete-category",sessionCheck.logged,adminController.delete_category)
 router.post("/undo-Category",sessionCheck.logged,adminController.undo_category)
 
+router.post("/disable-coupon",sessionCheck.logged,adminController.disable_coupon)
+router.post("/enable-coupon",sessionCheck.logged,adminController.enable_coupon)
+
 module.exports = router;

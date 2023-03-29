@@ -28,6 +28,10 @@ const couponSchema = mongoose.Schema({
     quantity:{
         type:Number,
         required:true
+    },
+    disable:{
+        type:Boolean,
+        default:false
     }
     
 })

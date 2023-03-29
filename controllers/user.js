@@ -77,7 +77,7 @@ const securePassword = async (password) => {
 
 const load_landing = async (req, res, next) => {
     try {
-        const category = await categorySearch.find({delete:0});
+        const category = await categorySearch.find({ delete: 0 });
         const products = await productView.find({ delete: 0 }).populate("category")
         res.render('landing', { products, category })
     } catch (err) {
@@ -211,7 +211,7 @@ const change_pass = async (req, res, next) => {
     try {
         const pass = await securePassword(req.body.password)
         const userid = req.session.user._id
-            const result = await userModify.findOneAndUpdate({ _id: userid }, {
+        const result = await userModify.findOneAndUpdate({ _id: userid }, {
             $set: {
                 password: pass
             }
@@ -249,7 +249,7 @@ const post_SignUp = async (req, res, next) => {
 const load_Home = async (req, res, next) => {
     try {
         const user = req.session.login
-        const category = await categorySearch.find({delete:0});
+        const category = await categorySearch.find({ delete: 0 });
         var products = await productView.find({ delete: 0 }).populate("category")
         res.render('home', { products, user, category })
     } catch (err) {
@@ -427,7 +427,6 @@ const add_to_cart = async (req, res, next) => {
         const id = req.session.login._id
         const productDetails = await productView.findOne({ _id: pdt_id })
         const check = await userModify.findOne({ _id: id, "cart.product": pdt_id })
-        console.log(productDetails)
         if (check == [] || check == null || check == 'undefined') {
             const quantity = 1
             await userModify.findOneAndUpdate({ _id: id }, {
@@ -595,11 +594,22 @@ const post_order = async (req, res, next) => {
                     }
                 }
             })
+            const walletbalance = user.wallet - (totalprice / 100)
             if (payment == "COD") {
+                res.json({ payment: payment, orderid: result._id })
+            } else if (payment == "WLT") {
+                await userModify.findOneAndUpdate({ _id: user._id },
+                    {   
+                        $set: { "wallet": walletbalance }
+                    })
+                await orderPlace.findOneAndUpdate({ _id: result._id }, {
+                    $set: {
+                        paymentstatus: "Completed"
+                    }
+                })
                 res.json({ payment: payment, orderid: result._id })
             } else {
 
-                // console.log(amount)
                 const options = {
                     amount: totalprice, // amount in paise
                     currency: "INR",
@@ -609,7 +619,7 @@ const post_order = async (req, res, next) => {
 
                 razorpay.orders.create(options, function (err, order) {
                     if (err) {
-                        res.json({status:false})
+                        res.json({ status: false })
                     } else {
                         req.session.orderid = order.id
                         res.json(order)
@@ -627,7 +637,6 @@ const post_order = async (req, res, next) => {
 }
 const conformation = async (req, res, next) => {
     try {
-        // paymentstatus
         const user = req.session.login
         const orderid = req.session.orderplaced._id
         await orderPlace.findOneAndUpdate({ _id: orderid }, {
@@ -728,7 +737,7 @@ const check_coupon = async (req, res, next) => {
         const { coupon } = req.body
         const id = req.session.login._id
         const date = new Date()
-        const couponDetails = await couponModel.findOne({ code: coupon })
+        const couponDetails = await couponModel.findOne({ code: coupon, disable: false })
         let couponAllow = true;
         if (couponDetails) {
             if (couponDetails.users.length > 0) {
@@ -787,12 +796,21 @@ const email_validarion = async (req, res, next) => {
 const cancel_order = async (req, res, next) => {
     try {
         const orderid = req.body.id
-        const Order = await orderPlace.findOneAndUpdate({ _id: orderid }, {
+        const user = req.session.login._id
+        const Order = await orderPlace.findOne({ _id: orderid })
+        if (Order.payement == "OP") {
+            await userModify.findOneAndUpdate({ _id: user },
+                {
+                    $inc: { "wallet": Order.totalprice }
+                })
+        }
+        await orderPlace.findOneAndUpdate({ _id: orderid }, {
             $push: {
                 orderstatus: "order cancelled"
             }
+        }).then(() => {
+            res.json({ status: true })
         })
-        res.json({ status: true })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -813,13 +831,32 @@ const address_on_checkout = async (req, res, next) => {
             $push: {
                 address: [datatoinsert]
             }
-        }, { new: true }).then(() =>res.json({status:true}));
+        }, { new: true }).then(() => res.json({ status: true }));
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
+const wallet_check = async (req, res, next) => {
+    try {
+        const wallet = req.session.login.wallet
+        const amount = req.body.amount
+        if (wallet < amount) {
+            res.json({ status: false })
+        } else {
+            res.json({
+                status: true,
+                wallet: wallet
+            })
+        }
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+
 module.exports = {
+    wallet_check,
     address_on_checkout,
     cancel_order,
     email_validarion,
