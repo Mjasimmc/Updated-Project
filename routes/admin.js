@@ -70,4 +70,13 @@ router.post("/undo-Category",sessionCheck.logged,adminController.undo_category)
 router.post("/disable-coupon",sessionCheck.logged,adminController.disable_coupon)
 router.post("/enable-coupon",sessionCheck.logged,adminController.enable_coupon)
 
+router.get('/coupon/:id',sessionCheck.logged,adminController.load_coupon_edit)
+router.post('/updatecoupon',sessionCheck.logged,adminController.update_coupon)
+// product offer
+
+router.post('/offer',sessionCheck.logged,adminController.offer_post)
+router.get('/deleteofer/:id',sessionCheck.logged,adminController.delete_offer)
+
+router.post('/remove-coupon',sessionCheck.logged,adminController.remove_coupon)
+
 module.exports = router;

@@ -131,7 +131,8 @@ const insert_product = async (req, res, next) => {
 }
 const insert_category = async (req, res, next) => {
     try {
-        const category = req.body.name;
+        let category = req.body.name;
+        category = category.toLowerCase();
         const product = new categorydata({
             category: category
         })
@@ -154,7 +155,7 @@ const insert_category = async (req, res, next) => {
 }
 const product_list = async (req, res, next) => {
     try {
-        let products = await productModidy.find()
+        let products = await productModidy.find().populate("category")
         res.render('productlist', { products })
 
     } catch (error) {
@@ -287,7 +288,7 @@ const view_order = async (req, res, next) => {
 }
 const list_coupon = async (req, res, next) => {
     try {
-        const couponList = await couponModel.find({})
+        const couponList = await couponModel.find({delete:false})
         res.render("coupon-list", { couponList })
     } catch (error) {
         console.log(error.message);
@@ -323,6 +324,7 @@ const post_add_coupon = async (req, res, next) => {
         next(error)
     }
 }
+
 const update_order = async (req, res, next) => {
     try {
         const { orderid, name } = req.body
@@ -432,17 +434,16 @@ const undo_category = async (req, res, next) => {
         next(error)
     }
 }
-
 const disable_coupon = async (req, res, next) => {
     try {
         const couponid = req.body.id
         const result = await couponModel.findOneAndUpdate(
             { _id: couponid },
             {
-                disable:true
+                disable: true
             }
-        ).then(()=>{
-            res.json({status:true})
+        ).then(() => {
+            res.json({ status: true })
         })
     } catch (error) {
         console.log(error.message)
@@ -455,17 +456,136 @@ const enable_coupon = async (req, res, next) => {
         const result = await couponModel.findOneAndUpdate(
             { _id: couponid },
             {
-                disable:false
+                disable: false
             }
-        ).then(()=>{
-            res.json({status:true})
+        ).then(() => {
+            res.json({ status: true })
         })
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
+const offer_post = async (req, res, next) => {
+    try {
+        const { offerpercentage, product } = req.body
+        const productdata = await productModidy.findOne({ _id: product })
+        if (productdata.offer.status) {
+            let amount = productdata.offerprice - ((productdata.price / 100) * offerpercentage)
+            const update = await productModidy.findOneAndUpdate(
+                { _id: product },
+                {
+                    $set: {
+                        offer: {
+                            status: true,
+                            amount: offerpercentage
+                        },
+                        offerprice: productdata.price,
+                        price: amount
+                    }
+                }
+            ).then(() => {
+                res.json({ status: true })
+            })
+        } else {
+
+            let amount = productdata.price - ((productdata.price / 100) * offerpercentage)
+            const update = await productModidy.findOneAndUpdate(
+                { _id: product },
+                {
+                    $set: {
+                        offer: {
+                            status: true,
+                            amount: offerpercentage
+                        },
+                        offerprice: productdata.price,
+                        price: amount
+                    }
+                }
+            ).then(() => {
+                res.json({ status: true })
+            })
+        }
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+const delete_offer = async (req, res, next) => {
+    try {
+        const id = req.params.id
+        const productdata = await productModidy.findOne({ _id: id })
+
+        await productModidy.findOneAndUpdate({ _id: id }, {
+            $set: {
+                offer: {
+                    status: false
+                },
+                offerprice: 0,
+                price: productdata.offerprice
+            }
+        }).then(() => {
+            res.redirect(`/admin/edit-product/${id}`)
+        })
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+const load_coupon_edit = async (req, res, next) => {
+    try {
+        const couponId = req.params.id;
+        const coupon = await couponModel.findOne({ _id: couponId })
+        req.session.couponId = coupon
+        res.render('coupon-edit', { coupon })
+    } catch (error) {
+        console.log(error.message);
+        next(error)
+    }
+}
+const update_coupon = async (req, res, next) => {
+    try {
+        let { name, code, date, amount, quantity } = req.body
+        date = parseInt(date)
+        const currentDate = new Date(req.session.couponId.issued_date)
+        const futureDate = new Date(currentDate.getTime() + (date * 24 * 60 * 60 * 1000));
+
+        await couponModel.findByIdAndUpdate({ _id: req.session.couponId._id }, {
+            $set: {
+                name: name,
+                code: code,
+                issued_date: currentDate,
+                validUpTo: futureDate,
+                amount: amount,
+                quantity: quantity
+            }
+        }).then(()=>{
+            res.redirect('/admin/coupon-list')
+        })
+    } catch (error) {
+        console.log(error);
+        next()
+    }
+}
+const remove_coupon = async (req,res,next)=>{
+    try {
+        const couponid = req.body.id
+        const result = await couponModel.findOneAndUpdate({_id:couponid},{
+            $set:{delete:true}
+        })
+        res.join({status:true})
+    } catch (error) {
+        console.log(error.message);
+        next(error)
+    }
+}
 module.exports = {
+    remove_coupon,
+    update_coupon,
+    load_coupon_edit,
+
+    delete_offer,
+    offer_post,
 
     disable_coupon,
     enable_coupon,

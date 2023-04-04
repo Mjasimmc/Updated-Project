@@ -20,13 +20,14 @@
                     <h6>Date : <%= order.orderdate %>
                     </h6>
                 </div>
-                <% if (order.orderstatus[order.orderstatus.length-1]=="order cancelled" ) { %>
+                <% if (order.orderstatus[order.orderstatus.length-1]=="order cancelled" ||order.orderstatus[order.orderstatus.length-1]=="Order Delivered")  { %>
 
-                    <h3 class="m-5 text-danger">Order Status : <%= order.orderstatus[order.orderstatus.length-1] %>
+                    <h3 class="m-5">Order Status : <%= order.orderstatus[order.orderstatus.length-1] %>
                     </h3>
+                    
                     <% } else { %>
 
-                        <h3 class="m-5 text-success" id="orderMessage">Order Status : <%= order.orderstatus[order.orderstatus.length-1] %>
+                        <h3 class="m-5" id="orderMessage">Order Status : <%= order.orderstatus[order.orderstatus.length-1] %>
                         </h3>
                         <div class="col-5 m-5" id="formdisplay">
                             <form action="" id="Myform">
@@ -34,7 +35,7 @@
                                     <option value="">Select</option>
                                     <option value="Order Checked">Order Checked</option>
                                     <option value="Out For Delivery">Out For Delivery</option>
-                                    <option value="Order Delivered">Order Delivered</option>
+                                    <option value="Order Delivered">Delivered</option>
                                 </select>
                                 <button class="btn btn-primary">Submit</button>
                             </form>

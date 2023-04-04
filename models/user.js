@@ -41,16 +41,25 @@ const userSchema = mongoose.Schema({
             quantity: {
                 type: Number,
             },
-            total:{
-                type:String
+            total: {
+                type: String
+            },
+            offer: {
+                offer: {
+                    type: Boolean,
+                    default: false
+                },
+                price: {
+                    type: Number
+                }
             }
         }
     ],
-    userorders:[
+    userorders: [
         {
-            orderid:{
-                type:String,
-                ref:'orders'
+            orderid: {
+                type: String,
+                ref: 'orders'
             }
         }
     ],
@@ -62,9 +71,9 @@ const userSchema = mongoose.Schema({
             }
         }
     ],
-    wallet:{
-        type:Number,
-        default:0
+    wallet: {
+        type: Number,
+        default: 0
     }
 })
 module.exports = mongoose.model('user', userSchema)

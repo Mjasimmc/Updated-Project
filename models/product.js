@@ -32,8 +32,13 @@ const productSchema = mongoose.Schema({
             default:false
         },
         amount:{
-            price:Number
+            type:Number,
+            default:0
         }
+    },
+    offerprice:{
+        type:Number,
+        default:0
     }
     
 })

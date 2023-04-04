@@ -19,8 +19,8 @@
                                         <th scope="col">price</th>
                                         <th scope="col">category</th>
                                         <th scope="col">stock</th>
-                                        <th scope="col">Edit</th>
-                                        <th scope="col">Delete</th>
+                                        <th scope="col">Offer</th>
+                                        <th scope="col">Manage</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -29,7 +29,7 @@
 
                                             <td>
                                                 <img src="/ProductImages/<%= element.image[0] %>" alt=""
-                                                    style="height: 100px; width:100px; object-fit: cover;">
+                                                    style="height: 100px; width:100px; object-fit: contain;">
                                             </td>
                                             <td>
                                                 <%= element.name %>
@@ -38,14 +38,21 @@
                                                 <%= element.price %>
                                             </td>
                                             <td>
-                                                <%= element.category %>
+                                                <%= element.category.category %>
                                             </td>
                                             <td>
                                                 <%= element.stock %>
                                             </td>
-                                            
-                                            <td><a href="/admin/edit-product/<%= element._id %>">edit</a></td>
                                             <td>
+                                                <% if (element.offer.status) { %>
+                                                 <div class="btn btn-success">active</div>
+                                                 <% } else { %>
+                                                    <div class="btn btn-warning">Inactive</div>
+                                                <% } %>
+                                            </td>
+                                            
+                                            <td><a class="btn" href="/admin/edit-product/<%= element._id %>">edit</a>
+                                            
 
                                                 <% if (element.delete==0) { %>
 
@@ -53,8 +60,7 @@
                                                         onclick="deleteProduct('<%= element._id %>','<%= index %>')">delete</button>
                                                     <button class="btn btn-success" style="display: none;"
                                                     id="undodelte<%= index %>"
-                                                    onclick="undoDelete('<%= element._id %>','<%= index %>')">Undo
-                                                        Delete</button>
+                                                    onclick="undoDelete('<%= element._id %>','<%= index %>')">Recover</button>
                                                     <% } else { %>
                                                     <script>
                                                         document.getElementById('row<%= index %>').style.color = "red"
@@ -64,10 +70,8 @@
                                                             onclick="deleteProduct('<%= element._id %>','<%= index %>')">delete</button>
 
                                                         <button class="btn btn-success" id="undodelte<%= index %>"
-                                                            onclick="undoDelete('<%= element._id %>','<%= index %>')">Undo
-                                                            Delete</button>
+                                                            onclick="undoDelete('<%= element._id %>','<%= index %>')">Recover</button>
                                                         <% } %>
-
                                             </td>
                                         </tr>
 

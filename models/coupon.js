@@ -32,6 +32,10 @@ const couponSchema = mongoose.Schema({
     disable:{
         type:Boolean,
         default:false
+    },
+    delete:{
+        type:Boolean,
+        default:false
     }
     
 })

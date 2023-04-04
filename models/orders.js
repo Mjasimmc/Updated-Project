@@ -10,6 +10,15 @@ const order = mongoose.Schema({
         },
         quantity: {
             type: Number
+        },
+        offer:{
+            status:{
+                type:Boolean,
+                default:false
+            },
+            price:{
+                type:Number
+            }
         }
     }],
     orderdate: {

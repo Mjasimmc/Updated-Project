@@ -23,13 +23,15 @@
                                                 <th>code</th>
                                                 <th>issued Date</th>
                                                 <th>validity</th>
+                                                <th>No of users</th>
                                                 <th>Discount</th>
-                                                <th>manage</th>
+                                                <th></th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% couponList.forEach((element,index)=> { %>
-                                                <tr>
+                                            <%couponList.forEach((element,index)=> { %>
+                                                <tr id="rowof<%= index %>">
                                                     <td>
                                                         <%= index+1 %>
                                                     </td>
@@ -47,9 +49,15 @@
                                                         <%= element.validUpTo %>
                                                     </td>
                                                     <td>
-                                                        <%= element.amount+"%" %>
+                                                        <%= element.quantity %>
                                                     </td>
                                                     <td>
+                                                        <%= element.amount+"%" %>
+                                                    </td>
+                                                    <td><a href="/admin/coupon/<%= element._id %>"
+                                                            class="btn btn-info">edit</a></td>
+                                                    <td>
+
                                                         <% if (element.disable) { %>
                                                             <button style="display: none;" id="disable<%= index %>"
                                                                 onclick="disablecoupon('<%= element._id %>','<%= index %>')"
@@ -67,9 +75,47 @@
                                                                     class="btn btn-success">Enable</button>
                                                                 <% } %>
 
+
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-danger"
+                                                            onclick="removeCoupon('<%= element._id %>','<%= index %>')">Remove</button>
                                                     </td>
                                                 </tr>
                                                 <% }) %>
+                                                    <script>
+                                                        function removeCoupon(id, index) {
+                                                            swal({
+                                                                title: "Are you sure?",
+                                                                text: "Do you want to delete Coupon",
+                                                                type: "warning",
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: "#DD6B55",
+                                                                confirmButtonText: "Yes",
+                                                                cancelButtonText: "No",
+                                                                closeOnConfirm: false,
+                                                                closeOnCancel: false
+                                                            },
+                                                                function (isConfirm) {
+                                                                    if (isConfirm) {
+                                                                        swal("deleted !", "Coupon Has been deleted", "success");
+
+                                                                        $.ajax({
+                                                                            url: "/admin/remove-coupon",
+                                                                            method: 'POST',
+                                                                            data: { id: id },
+                                                                            encoded: true,
+                                                                            success: function (response) {
+                                                                                document.getElementById(`rowof${index}`).style.display = "none"
+                                                                            }
+                                                                        });
+                                                                    } else {
+                                                                        swal("Cancelled", "Your request has been cancelled", "error");
+                                                                    }
+                                                                });
+
+                                                        }
+                                                    </script>
                                         </tbody>
                                     </table>
                                 </div>
@@ -109,12 +155,6 @@
                             swal("Cancelled", "Your request has been cancelled", "error");
                         }
                     });
-
-
-
-
-
-
             }
             function undodisablecoupon(id, num) {
                 swal({
@@ -146,10 +186,6 @@
                             swal("Cancelled", "Your request has been cancelled", "error");
                         }
                     });
-
-
-
-
             }
         </script>
         <%- include('../adminlayout/footer.ejs') %>

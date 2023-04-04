@@ -186,7 +186,12 @@
                                         </a>
 
                                         <span class="stext-105 cl3">
+                                            <% if (element.offer.status){%>
+                                                <del>$<%= element.offerprice %></del> $<%= element.price %>
+                                                
+                                                <% }else{%>
                                             $<%= element.price %>
+                                            <% } %>
                                         </span>
                                     </div>
 

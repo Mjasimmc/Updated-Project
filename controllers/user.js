@@ -434,6 +434,10 @@ const add_to_cart = async (req, res, next) => {
                     cart: {
                         product: pdt_id,
                         quantity: quantity,
+                        offer: {
+                            status: productDetails.offer.status,
+                            price: productDetails.price
+                        }
                     }
                 }
             }, { upsert: true })
@@ -525,7 +529,7 @@ const view_shop_before = async (req, res, next) => {
     try {
         const category = await categorySearch.find({});
         const { products } = req.session
-        res.render('shop-before', { products, category })
+        res.render('shop-before', { products, category,user:false })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -558,6 +562,7 @@ const post_order = async (req, res, next) => {
         for (let i = 0; i < user.cart.length; i++) {
             for (let j = 0; j < productsIn.length; j++) {
                 if (user.cart[i].product == productsIn[j]._id) {
+
                     const pdtq = productsIn[j].stock - user.cart[i].quantity
                     await productView.findOneAndUpdate({ _id: productsIn[j]._id }, { $set: { stock: pdtq } })
                 }
@@ -599,7 +604,7 @@ const post_order = async (req, res, next) => {
                 res.json({ payment: payment, orderid: result._id })
             } else if (payment == "WLT") {
                 await userModify.findOneAndUpdate({ _id: user._id },
-                    {   
+                    {
                         $set: { "wallet": walletbalance }
                     })
                 await orderPlace.findOneAndUpdate({ _id: result._id }, {
@@ -737,7 +742,7 @@ const check_coupon = async (req, res, next) => {
         const { coupon } = req.body
         const id = req.session.login._id
         const date = new Date()
-        const couponDetails = await couponModel.findOne({ code: coupon, disable: false })
+        const couponDetails = await couponModel.findOne({ code: coupon, disable: false, delete: false })
         let couponAllow = true;
         if (couponDetails) {
             if (couponDetails.users.length > 0) {
@@ -854,8 +859,20 @@ const wallet_check = async (req, res, next) => {
         next(error)
     }
 }
+const order_details = async (req, res, next) => {
+    try {
+        const user = req.session.login
+        const orderId = req.params.id
+        const orderDetails = await orderPlace.findOne({ _id: orderId }).populate("products.product")
+        res.render("order-details", { user, orderDetails })
+    } catch (error) {
+        console.log(error.message);
+        next(error)
+    }
+}
 
 module.exports = {
+    order_details,
     wallet_check,
     address_on_checkout,
     cancel_order,

@@ -154,8 +154,6 @@
                             <button class="size-113 flex-c-m fs-16 cl2 hov-cl1 trans-04">
                                 <i class="zmdi zmdi-search"></i>
                             </button>
-
-
                             <input class="mtext-107 cl2 size-114 plh2 p-r-15" type="text" name="search-product"
                                 placeholder="Search">
                         </div>
@@ -174,7 +172,7 @@
                             <div class="block2">
                                 <div class="block2-pic hov-img0">
                                     <img src="/ProductImages/<%= element.image[0] %>" height="270px"
-                                        style="object-fit: cover;" alt="IMG-PRODUCT">
+                                        style="object-fit: contain;" alt="IMG-PRODUCT">
 
                                     <a href="/product-home/<%= element._id %>"
                                         class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 ">
@@ -188,9 +186,14 @@
                                             class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
                                             <%= element.name %>
                                         </a>
-
+                                        
                                         <span class="stext-105 cl3">
+                                            <% if (element.offer.status){%>
+                                                <del>$<%= element.offerprice %></del> $<%= element.price %>
+                                                
+                                                <% }else{%>
                                             $<%= element.price %>
+                                            <% } %>
                                         </span>
                                     </div>
 

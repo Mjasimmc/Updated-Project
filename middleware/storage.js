@@ -11,16 +11,3 @@ module.exports = multer.diskStorage({
         cb(null, name)
     }
 })
-
-// const multer = require('multer');
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, 'public/uploads/');
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null,path.join(__dirname,'../public/ProductImages'))
-//   }
-// });
-
-// const upload = multer({ storage: storage });

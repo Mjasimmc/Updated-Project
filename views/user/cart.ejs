@@ -113,7 +113,7 @@
                                     </div>
                                     <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
                                         <div class="flex-w flex-m m-r-20 m-tb-5">
-                                            
+
                                         </div>
                                         <a href="/home">
                                             <div
@@ -132,7 +132,7 @@
                                     <div class="flex-w flex-t bor12 p-b-13">
                                         <div class="size-208">
                                             <span class="stext-110 cl2">
-                                                Subtotal:
+                                                Total:
                                             </span>
                                         </div>
                                         <div class="size-209">
@@ -140,17 +140,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="flex-w flex-t p-t-27 p-b-33">
-                                        <div class="size-208">
-                                            <span class="mtext-101 cl2">
-                                                Total:
-                                            </span>
-                                        </div>
-                                        <div class="size-209 p-t-1">
-                                            <span class="mtext-110 cl2" id="TotalAmount">
-                                            </span>
-                                        </div>
-                                    </div>
+
                                     <a href="/checkout"
                                         class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
                                         Proceed to Checkout
@@ -161,7 +151,7 @@
                     </div>
                 </form>
                 <% } %>
-                    
+
                     <script>
                         function updatePrice() {
                             let rows = document.querySelectorAll(".table_row");
@@ -235,9 +225,9 @@
                                 }, buttonsStyling: true
                             })
                             swalWithBootstrapButtons.fire({
-                                title: 'Are you sure?',text: "You won't be able to revert this!",
-                                icon: 'warning',showCancelButton: true,
-                                confirmButtonText: 'Yes, delete it!',cancelButtonText: 'No, cancel!',
+                                title: 'Are you sure?', text: "You won't be able to revert this!",
+                                icon: 'warning', showCancelButton: true,
+                                confirmButtonText: 'Yes, delete it!', cancelButtonText: 'No, cancel!',
                                 reverseButtons: true
                             }).then((result) => {
                                 if (result.isConfirmed) {
@@ -251,14 +241,11 @@
                                             decrementCartCount(num)
                                             updatePrice()
                                         }
-                                    }).then(()=>{
-                                        swalWithBootstrapButtons.fire('Deleted!','Product has been removed.','success')
+                                    }).then(() => {
+                                        swalWithBootstrapButtons.fire('Deleted!', 'Product has been removed.', 'success')
                                     })
-                                } else if (result.dismiss === Swal.DismissReason.cancel ) 
-                                {swalWithBootstrapButtons.fire('Cancelled','Product is not removed','error')}
+                                } else if (result.dismiss === Swal.DismissReason.cancel) { swalWithBootstrapButtons.fire('Cancelled', 'Product is not removed', 'error') }
                             })
-                            
-
                         }
                     </script>
 
