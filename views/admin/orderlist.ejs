@@ -8,8 +8,9 @@
         <div class="bg-light text-center rounded p-4">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="mb-0">Recent Sales</h6>
-                <a href="">Show All</a>
+                
             </div>
+           
             <div class="table-responsive">
                 <table class="table text-start align-middle table-bordered table-hover mb-0">
                     <thead>
@@ -24,16 +25,21 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <% let limitis = orders.length/10%>
+                        
                         <% orders.forEach((element,index) => { %>
-                            <tr>
-                                <td><%= index+1 %></td>
-                                <td><%= element.orderdate %></td>
+                                <tr>
+                                    <td><%= index+1 %></td>
+                                    <% const date = new Date(element.orderdate);
+                                const dateOnly = date.toISOString().slice(0, 10); %>
+                                <td><%= dateOnly %></td>
                                 <td><%= element.orderaddress.name %></td>
                                 <td>$<%= element.totalprice %></td>
                                 <td><%= element.payement %></td>
                                 <td><%= element.orderstatus[element.orderstatus.length-1] %></td>
                                 <td><a class="btn btn-sm btn-primary" href="/admin/orderList/<%= element._id %>">Detail</a></td>
                             </tr>
+                        </div>
                         <% }) %>
                         
                     </tbody>

@@ -12,6 +12,8 @@ const upload = multer({storage:storage})
 router.set('views', './views/admin')
 const adminController = require('../controllers/admin')
 const sessionCheck = require('../middleware/adminSession')
+const orderDetails = require('../middleware/orderSearch')
+const pdffile= require
 
 // admin login
 router.get('/',sessionCheck.notLogged,adminController.load_sign_in)
@@ -21,7 +23,7 @@ router.post('/login',sessionCheck.notLogged,adminController.post_login)
 router.get('/logout',adminController.logout)
 
 // admin home
-router.get('/home',sessionCheck.logged,adminController.load_home)
+router.get('/home',orderDetails,sessionCheck.logged,adminController.load_home)
 
 // profile
 router.get('/profile',sessionCheck.logged,adminController.load_profile)
@@ -78,5 +80,5 @@ router.post('/offer',sessionCheck.logged,adminController.offer_post)
 router.get('/deleteofer/:id',sessionCheck.logged,adminController.delete_offer)
 
 router.post('/remove-coupon',sessionCheck.logged,adminController.remove_coupon)
-
+router.post('/pdf-convert',sessionCheck.logged,)
 module.exports = router;

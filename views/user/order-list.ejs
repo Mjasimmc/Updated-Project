@@ -32,7 +32,10 @@
                                 <%= element.products.length %>
                             </td>
                             <td>
-                                <%= element.orderdate %>
+                                <% const date = new Date(element.orderdate);
+                                const dateOnly = date.toISOString().slice(0, 10);
+                                console.log(dateOnly); %>
+                                <%= dateOnly %>
                             </td>
                             <td>
                                 <%= element.orderstatus[element.orderstatus.length-1] %>
@@ -67,38 +70,32 @@
             crossorigin="anonymous"></script>
         <script>
             function cancelOrder(id, num) {
-                const swalWithBootstrapButtons = Swal.mixin({
-                    customClass: {
-                        confirmButton: 'btn btn-success',
-                        cancelButton: 'btn btn-danger'
-                    }, buttonsStyling: true
-                })
-                swalWithBootstrapButtons.fire({
-                    title: 'Are you sure?', text: "Do you cancel order!",
-                    icon: 'warning', showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!', cancelButtonText: 'No, cancel!',
-                    reverseButtons: true
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You won\'t be able to revert this!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Cancel Order!',
+                    cancelButtonText: 'No, cancel!',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        document.getElementById(`countnum${num}`).value = 0
                         $.ajax({
                             url: "/cancel-order",
                             method: 'POST',
                             data: { id: id },
                             encoded: true,
                             success: function (response) {
-                                console.log(response)
                                 document.getElementById(`notcancelled${num}`).style.display = "none"
                                 document.getElementById(`cancelled${num}`).style.display = ""
                             }
-                        }).then(() => {
-                            swalWithBootstrapButtons.fire('Deleted!', 'Product has been removed.', 'success')
                         })
-                    } else if (result.dismiss === Swal.DismissReason.cancel) { swalWithBootstrapButtons.fire('Cancelled', 'Product is not removed', 'error') }
-                })
-
+                    } else if (result.isDenied) {
+                       
+                    }
+                });
 
 
             }
+
         </script>
         <%- include('../layout/footer.ejs') %>

@@ -99,7 +99,6 @@ const post_email = async (req, res, next) => {
         req.session.email = sender
         const otpSend = Math.floor((Math.random() * 1000000) + 1)
         // for testing email otp
-        console.log(otpSend)
         req.session.sendOtp = otpSend
         sendOTP(sender, otpSend)
         res.render('otpChecking')
@@ -803,19 +802,22 @@ const cancel_order = async (req, res, next) => {
         const orderid = req.body.id
         const user = req.session.login._id
         const Order = await orderPlace.findOne({ _id: orderid })
-        if (Order.payement == "OP") {
+        if (Order.payement == "OP" || Order.payement == "WLT") {
             await userModify.findOneAndUpdate({ _id: user },
                 {
                     $inc: { "wallet": Order.totalprice }
                 })
         }
-        await orderPlace.findOneAndUpdate({ _id: orderid }, {
+        const result = await orderPlace.findOneAndUpdate({ _id: orderid }, {
             $push: {
                 orderstatus: "order cancelled"
             }
-        }).then(() => {
-            res.json({ status: true })
         })
+        if(result){
+            res.json({ status: true })
+        }else{
+            res.json({ status: true })
+        }
     } catch (error) {
         console.log(error.message)
         next(error)

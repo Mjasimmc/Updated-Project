@@ -46,8 +46,8 @@ const load_sign_in = async (req, res, next) => {
 }
 const load_home = async (req, res, next) => {
     try {
-        const orders = await orderModel.find({}).sort({}).populate("user")
-        res.render('home', { orders })
+        const orders = await orderModel.find({}).sort({orderdate:-1}).limit(6).populate("user")
+        res.render('home', { orders,todaySales:req.session.todaySales })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -268,7 +268,7 @@ const update_product = async (req, res, next) => {
 }
 const load_order_list = async (req, res, next) => {
     try {
-        const orders = await orderModel.find({}).populate("user")
+        const orders = await orderModel.find({}).sort({orderdate:-1}).populate("user")
         res.render('orderlist', { orders })
     } catch (error) {
         console.log(error.message)
@@ -324,7 +324,6 @@ const post_add_coupon = async (req, res, next) => {
         next(error)
     }
 }
-
 const update_order = async (req, res, next) => {
     try {
         const { orderid, name } = req.body

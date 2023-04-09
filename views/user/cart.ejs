@@ -1,6 +1,6 @@
 <%- include('../layout/header.ejs') %>
     <%- include('../layout/after-login.ejs') %>
-
+       =
         <div class="container m-5" id="nocartdata" style="display: none;">
             <h1>Your Cart is Empty</h1>
             <a href="/shop">
@@ -215,6 +215,8 @@
                                         updatePrice()
                                     }
                                 });
+                            }else{
+                                remove(pdt_id, num) 
                             }
                         }
                         function remove(pdt_id, num) {
