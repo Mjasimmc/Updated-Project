@@ -11,7 +11,8 @@ const { parse } = require('path');
 require('dotenv').config({ path: __dirname + '../config/.env' })
 const post_login = async (req, res, next) => {
     try {
-        const admindata = await adminDB.findOne()
+        const admindata = await adminDB.findOne({})
+        console.log(admindata);
         const email = admindata.email
         const password = admindata.password
         const useremail = req.body.email
