@@ -81,4 +81,7 @@ router.get('/deleteofer/:id',sessionCheck.logged,adminController.delete_offer)
 
 router.post('/remove-coupon',sessionCheck.logged,adminController.remove_coupon)
 router.post('/pdf-convert',sessionCheck.logged,)
+
+// router.get('/export-pdf',sessionCheck.logged,adminController.exportPdf)
+
 module.exports = router;

@@ -270,7 +270,7 @@ const update_product = async (req, res, next) => {
 const load_order_list = async (req, res, next) => {
     try {
         const orders = await orderModel.find({}).sort({orderdate:-1}).populate("user")
-        res.render('orderlist', { orders })
+        res.render('html-pdf', { orders })
     } catch (error) {
         console.log(error.message)
         next(error)
