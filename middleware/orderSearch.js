@@ -5,7 +5,6 @@ const searchOrder = async (req, res, next) => {
         const startOfToday = new Date();
         let yesterday = new Date(startOfToday.getTime() - (24 * 60 * 60 * 1000));
         yesterday = yesterday.toISOString().slice(0, 10);
-
         let todaySum = 0
         let totalSum = 0
         let yesSum = 0
