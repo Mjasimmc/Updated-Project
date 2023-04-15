@@ -5,14 +5,19 @@ const categorydata = require('../models/catogory')
 const orderModel = require('../models/orders')
 const couponModel = require('../models/coupon')
 
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+
+
 
 const path = require('path');
 const { parse } = require('path');
+const { page } = require('pdfkit');
+let downloadingContent
 require('dotenv').config({ path: __dirname + '../config/.env' })
 const post_login = async (req, res, next) => {
     try {
         const admindata = await adminDB.findOne({})
-        console.log(admindata);
         const email = admindata.email
         const password = admindata.password
         const useremail = req.body.email
@@ -47,8 +52,8 @@ const load_sign_in = async (req, res, next) => {
 }
 const load_home = async (req, res, next) => {
     try {
-        const orders = await orderModel.find({}).sort({orderdate:-1}).limit(6).populate("user")
-        res.render('home', { orders,todaySales:req.session.todaySales })
+        const orders = await orderModel.find({}).sort({ orderdate: -1 }).limit(6).populate("user")
+        res.render('home', { orders, todaySales: req.session.todaySales })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -269,8 +274,10 @@ const update_product = async (req, res, next) => {
 }
 const load_order_list = async (req, res, next) => {
     try {
-        const orders = await orderModel.find({}).sort({orderdate:-1}).populate("user")
-        res.render('html-pdf', { orders })
+        const page = parseInt(req.params.page)
+        const orders = await orderModel.find({}).skip(10*(page-1)).limit(10).sort({ orderdate: -1 }).populate("user")
+        downloadingContent = orders
+        res.render('orderlist', { orders ,page})
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -289,7 +296,7 @@ const view_order = async (req, res, next) => {
 }
 const list_coupon = async (req, res, next) => {
     try {
-        const couponList = await couponModel.find({delete:false})
+        const couponList = await couponModel.find({ delete: false })
         res.render("coupon-list", { couponList })
     } catch (error) {
         console.log(error.message);
@@ -559,7 +566,7 @@ const update_coupon = async (req, res, next) => {
                 amount: amount,
                 quantity: quantity
             }
-        }).then(()=>{
+        }).then(() => {
             res.redirect('/admin/coupon-list')
         })
     } catch (error) {
@@ -567,19 +574,63 @@ const update_coupon = async (req, res, next) => {
         next()
     }
 }
-const remove_coupon = async (req,res,next)=>{
+const remove_coupon = async (req, res, next) => {
     try {
         const couponid = req.body.id
-        const result = await couponModel.findOneAndUpdate({_id:couponid},{
-            $set:{delete:true}
+        const result = await couponModel.findOneAndUpdate({ _id: couponid }, {
+            $set: { delete: true }
         })
-        res.join({status:true})
+        res.join({ status: true })
+    } catch (error) {
+        console.log(error.message);
+        next(error)
+    }
+}
+
+const downloadpdf = async (req, res, next) => {
+    try {
+        const content = req.params.content
+        console.log(content);
+        const browser = await puppeteer.launch();
+
+        // create a new page
+        const page = await browser.newPage();
+
+        // navigate to the HTML page to convert
+        await page.goto(`http://localhost:3000/admin/pdfcontent/${"jasim"}`);
+
+        // generate the PDF from the HTML page
+        const pdf = await page.pdf();
+
+        // save the PDF to the server
+        const filename = 'my-document.pdf';
+        fs.writeFileSync(filename, pdf);
+
+        // close the browser instance
+        await browser.close();
+
+        // serve the file to the client and trigger a download in the browser
+        res.download(filename);
+
+        } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+const pdfPage = async (req,res,next)=>{
+    try {console.log(req.session)
+        const orders = downloadingContent
+
+        res.render('orderlist-pdf', { orders })
     } catch (error) {
         console.log(error.message);
         next(error)
     }
 }
 module.exports = {
+    pdfPage,
+    downloadpdf,
+
     remove_coupon,
     update_coupon,
     load_coupon_edit,

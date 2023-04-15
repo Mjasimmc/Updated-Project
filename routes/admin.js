@@ -51,10 +51,10 @@ router.get('/categorylist',sessionCheck.logged,adminController.category_list)
 router.get('/category',sessionCheck.logged,adminController.load_category)
 router.post('/addcategory',sessionCheck.logged,adminController.insert_category)
 
-router.get('/orderList',sessionCheck.logged,adminController.load_order_list)
+router.get('/orderList/:page',sessionCheck.logged,adminController.load_order_list)
 
 
-router.get('/orderList/:id',sessionCheck.logged,adminController.view_order)
+router.get('/order/:id',sessionCheck.logged,adminController.view_order)
 
 router.get('/coupon-list',sessionCheck.logged,adminController.list_coupon)
 router.get('/addcoupon',sessionCheck.logged,adminController.load_add_coupon )
@@ -82,6 +82,7 @@ router.get('/deleteofer/:id',sessionCheck.logged,adminController.delete_offer)
 router.post('/remove-coupon',sessionCheck.logged,adminController.remove_coupon)
 router.post('/pdf-convert',sessionCheck.logged,)
 
-// router.get('/export-pdf',sessionCheck.logged,adminController.exportPdf)
+router.get('/export-pdf/:content',sessionCheck.logged,adminController.downloadpdf)
+router.get("/pdfcontent/:name",adminController.pdfPage)
 
 module.exports = router;

@@ -43,6 +43,57 @@
         </div>
     </div>
     <!-- Sale & Revenue End -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <section>
+
+        <div>
+            <canvas id="myChart"></canvas>
+        </div>
+        <script src="script.js"></script>
+    </section>
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['<%= todaySales.yesSum %>', '<%=  todaySales.yesterday %>',],
+        datasets: [{
+            label: 'My First Dataset',
+            data: [
+            '<%= todaySales.todaySum %>', '<%= todaySales.yesSum %>',],
+            fill: true,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        plugins: {
+            title: {
+                display: true,
+                text: 'Line Chart Example'
+            },
+            legend: {
+                display: true,
+                position: 'bottom'
+            }
+        },
+        scales: {
+            y: {
+                title: {
+                    display: true,
+                    text: 'Value'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Month'
+                }
+            }
+        }
+    }
+});
+    </script>
 
 
  
@@ -78,7 +129,7 @@
                                 <td>$<%= element.totalprice %></td>
                                 <td><%= element.payement %></td>
                                 <td><%= element.orderstatus[element.orderstatus.length-1] %></td>
-                                <td><a class="btn btn-sm btn-primary" href="/admin/orderList/<%= element._id %>">Detail</a></td>
+                                <td><a class="btn btn-sm btn-primary" href="/admin/order/<%= element._id %>">Detail</a></td>
                             </tr>
                         <% }) %>
                         
