@@ -166,7 +166,7 @@
                 <div class="row isotope-grid">
                     <!-- start loop -->
                     <% products.forEach((element,index)=> {
-                        if (element.stock > 0 && index <4) { %>
+                        if (index <4) { %>
                         <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item <%= element.category.category %>">
                             <!-- Block2 -->
                             <div class="block2">
@@ -202,13 +202,17 @@
                                             <img class="icon-heart1 dis-block trans-04"
                                                 src="userTemplate/images/icons/icon-heart-01.png" alt="ICON">
                                             <img class="icon-heart2 dis-block trans-04 ab-t-l"
-                                                src="userTemplate/images/icons/icon-heart-02.png" alt="ICON">
-                                        </button>
-                                    </div>
+                                            src="userTemplate/images/icons/icon-heart-02.png" alt="ICON">
+                                            </button>
+                                            </div>
+                                            
+                                            <% if (element.stock > 0 ){%>
                                     <% let product = false
+                                    
                                     for( let index = 0; index < user.cart.length; index++ ) { 
                                         if (user.cart[index].product == element._id) {
                                             product = true }  } %>
+                                    
                                      <% if (product == true) { %>
 										<a href="/view-cart" id="goto<%= index %>" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
 											Go to cart
@@ -225,6 +229,11 @@
                                         class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
                                         Go to cart
                                     </button></a>
+                                    <% }else{ %>
+                                    <div onclick=" showNon()" class="btn-danger flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
+                                        Out of Stock
+										</div>
+                                    <%}%>
                                     
                                 </div>
                             </div>
@@ -233,6 +242,15 @@
 
                         <% } }) %>
                             <script>
+                                function showNon(){
+			                    	Swal.fire({
+			                    		position: 'center',
+			                    		icon: 'info',
+			                    		title: 'Out of Stock',
+			                    		showConfirmButton: false,
+			                    		timer: 1000
+			                    	})
+			                    }
                                 function increment(pdt_id, num) {
                                     document.getElementById(`goto${num}`).style.display = ""
 
@@ -246,7 +264,7 @@
                                         success: function (response) {
                                             if (response.increment) {
                                                 Swal.fire({
-						                        	position: 'top-end',
+						                        	position: 'center',
 						                        	icon: 'success',
 						                        	title: 'Your work has been saved',
 						                        	showConfirmButton: false,
@@ -262,7 +280,7 @@
                                     let currentValue = parseInt(cartIcon.getAttribute('data-notify'));
                                     currentValue += 1;
                                     Swal.fire({
-						                        	position: 'top-end',
+						                        	position: 'center',
 						                        	icon: 'success',
 						                        	title: 'Product is added to Wishlist',
 						                        	showConfirmButton: false,
@@ -285,7 +303,7 @@
                                             
                                         }else{
                                             Swal.fire({
-						                        	position: 'top-end',
+						                        	position: 'center',
 						                        	icon: 'info',
 						                        	title: 'Product is already added to Wishlist',
 						                        	showConfirmButton: false,

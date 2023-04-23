@@ -29,12 +29,15 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
-
+app.set('views', './views/error')
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    const error = {
+        status:502,
+        message:"Server error"
+    }
+    res.render('error-404',{error})
 });
 app.use('/*', errorRoute)
-
 
 app.listen(process.env.PORT, () => console.log("server is running"))

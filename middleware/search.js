@@ -4,6 +4,22 @@ const categorySearch = require('../models/catogory')
 const search_result = async (req, res, next) => {
     try {
         const products = await productView.find({ delete: 0 }).populate("category")
+        let category = []
+        for(let i=0 ;i < products.length ; i++){
+            let notpresent =  false
+            for(let j=0 ; j<category.length;j++){
+                if(category[j] == products[i].category.category){
+                    notpresent = true
+                    break
+                }
+            }
+            if(notpresent == false){
+                category[category.length] =  products[i].category.category
+            }
+
+
+        }
+        req.session.category = category
         req.session.products = products;
 
         next();
@@ -81,7 +97,7 @@ const search = async (req, res, next) => {
             }).populate("category")
             const category = []
             for (let i = 0; i < products.length; i++) {
-                checkingarray(category, products[i].category)
+                checkingarray(category, products[i].category.category)
             }
             if(req.session.login){
 

@@ -29,9 +29,8 @@
                         <% orders.forEach((element,index) => { %>
                                 <tr>
                                     <td><%= index+1+(page-1)*10 %></td>
-                                    <% const date = new Date(element.orderdate);
-                                const dateOnly = date.toISOString().slice(0, 10); %>
-                                <td><%= dateOnly %></td>
+                                    
+                                <td><%= element.orderdate%></td>
                                 <td><%= element.orderaddress.name %></td>
                                 <td>$<%= element.totalprice %></td>
                                 <td><%= element.payement %></td>

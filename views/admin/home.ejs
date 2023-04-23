@@ -1,6 +1,9 @@
 <%- include('../adminlayout/header.ejs') %>
 <%- include('../adminlayout/navbar.ejs') %>
-
+<script>
+    let dashboardLink = document.getElementById("dashboard");
+dashboardLink.classList.add("active");
+</script>
     <!-- Sale & Revenue Start -->
     <div class="container-fluid pt-4 px-4">
         <div class="row g-4">
@@ -8,8 +11,8 @@
                 <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                     <i class="fa fa-chart-line fa-3x text-primary"></i>
                     <div class="ms-3">
-                        <p class="mb-2">Today Sale</p>
-                        <h6 class="mb-0">$<%= todaySales.todaySum %></h6>
+                        <p class="mb-2">Today Orders</p>
+                        <h6 class="mb-0"><%= todaySales.todayOrders %></h6>
                     </div>
                 </div>
             </div>
@@ -17,8 +20,8 @@
                 <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                     <i class="fa fa-chart-bar fa-3x text-primary"></i>
                     <div class="ms-3">
-                        <p class="mb-2">Total Sale</p>
-                        <h6 class="mb-0">$<%= todaySales.totalSum %></h6>
+                        <p class="mb-2">Total Orders</p>
+                        <h6 class="mb-0"><%= todaySales.totalOrders %></h6>
                     </div>
                 </div>
             </div>
@@ -27,7 +30,7 @@
                     <i class="fa fa-chart-area fa-3x text-primary"></i>
                     <div class="ms-3">
                         <p class="mb-2">Today Revenue</p>
-                        <h6 class="mb-0">$<%= todaySales.todaySum %></h6>
+                        <h6 class="mb-0">$<%= todaySales.oneSum %></h6>
                     </div>
                 </div>
             </div>
@@ -44,9 +47,10 @@
     </div>
     <!-- Sale & Revenue End -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <section>
-
+    <section class="mt-5">
+        
         <div>
+            <h3>Weekly Revenue Chart     </h3>
             <canvas id="myChart"></canvas>
         </div>
         <script src="script.js"></script>
@@ -56,11 +60,23 @@
 var chart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: ['<%= todaySales.yesSum %>', '<%=  todaySales.yesterday %>',],
+        labels: ['<%= todaySales.one %>',
+        '<%=  todaySales.two %>',
+        '<%=  todaySales.three %>',
+        '<%=  todaySales.four %>',
+        '<%=  todaySales.five %>',
+        '<%=  todaySales.six %>',
+        '<%=  todaySales.seven %>',],
         datasets: [{
-            label: 'My First Dataset',
+            label: 'Amount',
             data: [
-            '<%= todaySales.todaySum %>', '<%= todaySales.yesSum %>',],
+            '<%= todaySales.oneSum %>',
+             '<%= todaySales.twoSum %>',
+             '<%= todaySales.threeSum %>',
+             '<%= todaySales.fourSum %>',
+             '<%= todaySales.fiveSum %>',
+             '<%= todaySales.sixSum %>',
+             '<%= todaySales.sevenSum %>',],
             fill: true,
             borderColor: 'rgb(75, 192, 192)',
             tension: 0.1
@@ -83,12 +99,6 @@ var chart = new Chart(ctx, {
                     display: true,
                     text: 'Value'
                 }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: 'Month'
-                }
             }
         }
     }
@@ -103,7 +113,7 @@ var chart = new Chart(ctx, {
         <div class="bg-light text-center rounded p-4">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="mb-0">Recent Sales</h6>
-                <a href="/admin/orderlist">Show All</a>
+                <a href="/admin/orderlist/1">Show All</a>
             </div>
             <div class="table-responsive">
                 <table class="table text-start align-middle table-bordered table-hover mb-0">
@@ -121,10 +131,8 @@ var chart = new Chart(ctx, {
                     <tbody>
                         <% orders.forEach((element,index) => { %>
                             <tr>
-                                <% const date = new Date(element.orderdate);
-                                const dateOnly = date.toISOString().slice(0, 10); %>
                                 <td><%= index+1 %></td>
-                                <td><%= dateOnly %></td>
+                                <td><%= element.orderdate %></td>
                                 <td><%= element.orderaddress.name %></td>
                                 <td>$<%= element.totalprice %></td>
                                 <td><%= element.payement %></td>

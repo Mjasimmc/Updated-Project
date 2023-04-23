@@ -6,9 +6,8 @@
     <div class="row g-4">
         <form action="/admin/updatecategory" method="post">
             <div class="mb-3">
-                <label  class="form-label"> Category Name</label>
-                <% console.log(categorydetails) %>
-                <input type="text" value="<%= categorydetails._id %>" name="id">
+                <label  class="form-label"> Category Name</label><br>
+                <input type="text" class="form-control" value="<%= categorydetails._id %>" readonly name="id"><br>
                 <input type="text" class="form-control" value="<%= categorydetails.category %>" name="name" required>
             </div>
             <input type="submit" class="btn btn-primary" value="Submit">

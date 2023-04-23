@@ -7,7 +7,7 @@
                 crossorigin="anonymous">
 
         </head>
-        <div class="container">
+        <div class="container mb-5">
             <table class="table">
                 <thead>
                     <tr>
@@ -17,6 +17,7 @@
                         <th scope="col">Date</th>
                         <th scope="col">Order status</th>
                         <th scope="col">Total price</th>
+                        <th scope="col"></th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -32,10 +33,8 @@
                                 <%= element.products.length %>
                             </td>
                             <td>
-                                <% const date = new Date(element.orderdate);
-                                const dateOnly = date.toISOString().slice(0, 10);
-                                console.log(dateOnly); %>
-                                <%= dateOnly %>
+                           
+                                <%= element.orderdate %>
                             </td>
                             <td>
                                 <%= element.orderstatus[element.orderstatus.length-1] %>

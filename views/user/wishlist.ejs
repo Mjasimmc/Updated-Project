@@ -13,7 +13,7 @@
                     </tr>
 
                     <% user.wishlist.forEach((element,index)=> { %>
-                        <tr class="table_row" id="<%= "button"+index %>">
+                        <tr class="table_row" id="<%= "buttonsd"+index %>">
                             <td class="column-1">
                                 <div class="how-itemcart1">
                                     <img src="/ProductImages/<%= element.product.image[0] %>" alt="IMG">
@@ -29,7 +29,34 @@
                             </td>
                             <td class="column-4">
                                 <div class="wrap-num-product flex-w m-l-auto m-r-0">
-                                    <button class="col btn-primary">Add to Cart</button>
+                                    <% if (element.product.stock > 0 ){%>
+                                        <% let product = false
+                                        
+                                        for( let index = 0; index < user.cart.length; index++ ) { 
+                                            if (user.cart[index].product == element.product._id) {
+                                                product = true }  } %>
+                                        
+                                         <% if (product == true) { %>
+                                            <a href="/view-cart" id="goto<%= index %>" class="btn btn-primary col">
+                                                Go to cart
+                                            </a>
+                                          <% } else { %>
+                                            <button onclick="increment('<%= element.product._id %>','<%= index %>')"
+                                                id="button<%= index %>"
+                                                class="btn btn-primary col">
+                                                Add to cart
+                                            </button>
+                                         <% } %>
+                                         <a href="/view-cart" id="goto<%= index %>" style="display: none;" class="btn btn-primary col">
+                                            <button
+                                            class="btn btn-primary col">
+                                            Go to cart
+                                        </button></a>
+                                        <% }else{ %>
+                                        <div onclick="showNon()" class="btn-danger btn btn-primary col">
+                                            Out of Stock
+                                            </div>
+                                        <%}%>   
                                 </div>
                             </td>
                             <td class="column-5">
@@ -63,7 +90,7 @@
                     encoded: true,
                     success: function (response) {
                         console.log("ok")
-                        document.getElementById(`button${num}`).style.display = "none"
+                        document.getElementById(`buttonsd${num}`).style.display = "none"
                         decrement()   
                     }
                 });
@@ -77,6 +104,45 @@
                     document.getElementById("emptywish").style.display = ""
                 }
             }
+            function showNon(){
+				Swal.fire({
+					position: 'center',
+					icon: 'info',
+					title: 'Out of Stock',
+					showConfirmButton: false,
+					timer: 1000
+				})
+			}
+			function increment(pdt_id,num) {
+                $.ajax({
+                    url: "/add-cart",
+					method: 'POST',
+					data: { pdt_id: pdt_id },
+					encoded: true,
+					success: function (response) {
+						if (response.increment) {
+                            document.getElementById(`goto${num}`).style.display = ""
+                            document.getElementById(`button${num}`).style.display = "none"
+							Swal.fire({
+								position: 'center',
+								icon: 'success',
+								title: 'Product is added to cart',
+								showConfirmButton: false,
+								timer: 1000	
+							})
+							incrementCartCount()
+						}
+					}
+				});
+			}
+			function incrementCartCount() {
+				let cartIcon = document.querySelector('.icon-header-noti');
+				let currentValue = parseInt(cartIcon.getAttribute('data-notify'));
+				currentValue += 1;
+				cartIcon.setAttribute('data-notify', currentValue);
+				let cartIconMob = document.getElementById('carticonincrement');
+				cartIconMob.setAttribute('data-notify', currentValue);
+			}
         </script>
 
 

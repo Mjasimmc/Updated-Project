@@ -36,6 +36,7 @@
                         <th scope="col">Name</th>
                         <th scope="col">price</th>
                         <th scope="col">Quantity</th>
+                        <th scope="col">Return Product</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -56,6 +57,13 @@
                           </td>
                           <td>
                             <%= element.quantity %>
+                          </td>t
+                          <td>
+                            <% if(element.products.productreturn) {%>
+                              <% }else{ %>
+                                <a href="/" class="btn btn-danger">Return</a>
+                              <% } %>
+                            
                           </td>
                         </tr>
 

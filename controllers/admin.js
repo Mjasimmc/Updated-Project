@@ -5,10 +5,8 @@ const categorydata = require('../models/catogory')
 const orderModel = require('../models/orders')
 const couponModel = require('../models/coupon')
 
-const puppeteer = require('puppeteer');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fs = require('fs');
-
-
 
 const path = require('path');
 const { parse } = require('path');
@@ -179,7 +177,7 @@ const delete_product = async (req, res, next) => {
                     status: true,
                 })
             }).catch((err) => {
-                console.log(err)
+                (err)
                 res.json({
                     status: false
                 })
@@ -194,7 +192,6 @@ const undo_delete_product = async (req, res, next) => {
 
     try {
         const userid = req.body.id
-        console.log(userid)
         await productModidy.findOneAndUpdate({ _id: userid }, { $set: { delete: 0 } })
             .then(() => {
                 res.json({
@@ -275,9 +272,9 @@ const update_product = async (req, res, next) => {
 const load_order_list = async (req, res, next) => {
     try {
         const page = parseInt(req.params.page)
-        const orders = await orderModel.find({}).skip(10*(page-1)).limit(10).sort({ orderdate: -1 }).populate("user")
+        const orders = await orderModel.find({}).skip(10 * (page - 1)).limit(10).sort({ orderdate: -1 }).populate("user")
         downloadingContent = orders
-        res.render('orderlist', { orders ,page})
+        res.render('orderlist', { orders, page })
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -326,7 +323,7 @@ const post_add_coupon = async (req, res, next) => {
             amount: amount,
             quantity: quantity
         })
-        await newCoupon.save().then(() => console.log("coupn entered")); res.redirect("/admin/coupon-list")
+        await newCoupon.save().then(() => res.redirect("/admin/coupon-list"))
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -393,13 +390,11 @@ const update_category = async (req, res, next) => {
     try {
         const category = req.body.id
         const name = req.body.name
-        console.log(category, name);
         const detiails = await categorydata.findOneAndUpdate({ _id: category }, {
             $set: {
                 category: name
             }
         })
-        console.log(detiails)
 
         res.redirect("/admin/categorylist")
     } catch (error) {
@@ -415,7 +410,6 @@ const delete_category = async (req, res, next) => {
                 delete: 1
             }
         })
-        console.log(detiails)
         res.json({
             status: true
         })
@@ -432,7 +426,6 @@ const undo_category = async (req, res, next) => {
                 delete: 0
             }
         })
-        console.log(detiails)
         res.json({
             status: true
         })
@@ -570,7 +563,7 @@ const update_coupon = async (req, res, next) => {
             res.redirect('/admin/coupon-list')
         })
     } catch (error) {
-        console.log(error);
+        console.log(error.message);
         next()
     }
 }
@@ -589,36 +582,38 @@ const remove_coupon = async (req, res, next) => {
 
 const downloadpdf = async (req, res, next) => {
     try {
-        const content = req.params.content
-        console.log(content);
-        const browser = await puppeteer.launch();
+        const tableData = await orderModel.find()
+        const csvHeader = [
+            { id: 'user', title: 'User' },
+            { id: 'totalprice', title: 'Total price' },
+            { id: 'paymentstatus', title: 'paymentstatus' }
+        ];
 
-        // create a new page
-        const page = await browser.newPage();
+        // Create a CSV writer and write the table data to a CSV file
+        const csvWriter = createCsvWriter({
+            path: 'table.csv',
+            header: csvHeader
+        });
+        await csvWriter.writeRecords(tableData);
 
-        // navigate to the HTML page to convert
-        await page.goto(`http://localhost:3000/admin/pdfcontent/${"jasim"}`);
+        // Set the headers to trigger a file download
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=table.csv');
 
-        // generate the PDF from the HTML page
-        const pdf = await page.pdf();
-
-        // save the PDF to the server
-        const filename = 'my-document.pdf';
-        fs.writeFileSync(filename, pdf);
-
-        // close the browser instance
-        await browser.close();
-
-        // serve the file to the client and trigger a download in the browser
-        res.download(filename);
-
-        } catch (error) {
+        // Send the CSV file to the client for download
+        res.download('table.csv', 'table.csv', (err) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error generating CSV file');
+            }
+        });
+    } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const pdfPage = async (req,res,next)=>{
-    try {console.log(req.session)
+const pdfPage = async (req, res, next) => {
+    try {
         const orders = downloadingContent
 
         res.render('orderlist-pdf', { orders })

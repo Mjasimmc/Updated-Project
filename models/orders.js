@@ -11,25 +11,27 @@ const order = mongoose.Schema({
         quantity: {
             type: Number
         },
-        offer:{
-            status:{
-                type:Boolean,
-                default:false
-            },
-            price:{
-                type:Number
+        offer: {
+            price: {
+                type: Number
             }
-        }
+        },
+        productreturn: [
+            {
+                type: String,
+                default: false
+            }
+        ]
     }],
     orderdate: {
-        type: Date
+        type: String
     },
     payement: {
         type: String
     },
     orderstatus: [
         String
-    ],  
+    ],
     orderaddress: {
         name: { type: String },
         mobile: { type: Number },
@@ -42,9 +44,9 @@ const order = mongoose.Schema({
     totalprice: {
         type: Number
     },
-    paymentstatus:{
-        type:String,
-        default:"pending"
+    paymentstatus: {
+        type: String,
+        default: "pending"
     }
 })
 module.exports = mongoose.model('order', order)

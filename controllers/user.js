@@ -8,6 +8,8 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 require('dotenv').config({ path: __dirname + '../config/.env' })
 const Razorpay = require('razorpay');
+const product = require('../models/product')
+const moment = require('moment');
 const razorpay = new Razorpay({
     key_id: process.env.key_id,
     key_secret: process.env.key_secret,
@@ -24,7 +26,7 @@ function validateEmail(email) {
     const regex = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
     return regex.test(email);
 }
-const email_check = async (req, res, next) => {
+const emailCheck = async (req, res, next) => {
     try {
         const email = req.body.email
         const userdata = await userModify.findOne({ email: email })
@@ -75,7 +77,7 @@ const securePassword = async (password) => {
 }
 
 
-const load_landing = async (req, res, next) => {
+const loadLanding = async (req, res, next) => {
     try {
         const category = await categorySearch.find({ delete: 0 });
         const products = await productView.find({ delete: 0 }).populate("category")
@@ -85,7 +87,7 @@ const load_landing = async (req, res, next) => {
         next(err);
     }
 }
-const load_email_send = async (req, res, next) => {
+const loadEmailSend = async (req, res, next) => {
     try {
         res.render('EmailToSend')
     } catch (err) {
@@ -93,7 +95,7 @@ const load_email_send = async (req, res, next) => {
         next(err);
     }
 }
-const post_email = async (req, res, next) => {
+const postEmail = async (req, res, next) => {
     try {
         const sender = req.body.email
         req.session.email = sender
@@ -107,7 +109,7 @@ const post_email = async (req, res, next) => {
         next(error)
     }
 }
-const verify_Otp = async (req, res, next) => {
+const verifyOtp = async (req, res, next) => {
     try {
         const otp = req.session.sendOtp
         const userOtp = req.body.post
@@ -122,7 +124,7 @@ const verify_Otp = async (req, res, next) => {
 
     }
 }
-const load_SignUp = async (req, res, next) => {
+const loadSignUp = async (req, res, next) => {
     try {
         const email = req.session.email
         let alertMessage = req.session.signupmessage
@@ -133,7 +135,7 @@ const load_SignUp = async (req, res, next) => {
         next(error)
     }
 }
-const load_SignIn = async (req, res, next) => {
+const loadSignIn = async (req, res, next) => {
     try {
 
         let alertMessage = req.session.loginmessage
@@ -144,7 +146,7 @@ const load_SignIn = async (req, res, next) => {
         next(err);
     }
 }
-const post_SignIn = async (req, res, next) => {
+const postSignIn = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         let userdata = await userModify.findOne({ email: email });
@@ -168,7 +170,7 @@ const post_SignIn = async (req, res, next) => {
         next(err);
     }
 }
-const load_forgot_password = async (req, res, next) => {
+const loadForgotPassword = async (req, res, next) => {
     try {
         res.render('emailForgetpass')
     } catch (error) {
@@ -176,7 +178,7 @@ const load_forgot_password = async (req, res, next) => {
         next(error)
     }
 }
-const post_number_forget_pass = async (req, res, next) => {
+const postNumberForgetPass = async (req, res, next) => {
     try {
         const email = req.body.email
         req.session.user = await userModify.findOne({ email: email })
@@ -191,7 +193,7 @@ const post_number_forget_pass = async (req, res, next) => {
         next(error)
     }
 }
-const post_otp_pass = async (req, res, next) => {
+const postOtpPass = async (req, res, next) => {
     try {
         const otp = req.session.sendOtp
         const userOtp = req.body.post
@@ -206,7 +208,7 @@ const post_otp_pass = async (req, res, next) => {
         console.log(error.message)
     }
 }
-const change_pass = async (req, res, next) => {
+const changePass = async (req, res, next) => {
     try {
         const pass = await securePassword(req.body.password)
         const userid = req.session.user._id
@@ -221,7 +223,7 @@ const change_pass = async (req, res, next) => {
         next(error)
     }
 }
-const post_SignUp = async (req, res, next) => {
+const postSignUp = async (req, res, next) => {
     try {
         const { mobile, name } = req.body
         let email = req.session.email
@@ -245,7 +247,7 @@ const post_SignUp = async (req, res, next) => {
         next(err);
     }
 }
-const load_Home = async (req, res, next) => {
+const loadHome = async (req, res, next) => {
     try {
         const user = req.session.login
         const category = await categorySearch.find({ delete: 0 });
@@ -265,7 +267,10 @@ const logout = async (req, res, next) => {
         next(err);
     }
 }
-const not_logged_browse_Product = async (req, res, next) => {
+
+
+
+const notLoggedBrowseProduct = async (req, res, next) => {
     try {
         const prid = req.params.id
         const prdetails = await productView.findOne({ _id: prid });
@@ -278,7 +283,7 @@ const not_logged_browse_Product = async (req, res, next) => {
         next(err);
     }
 }
-const logged_browse_product = async (req, res, next) => {
+const loggedBrowseProduct = async (req, res, next) => {
     try {
         const prid = req.params.id
         const user = req.session.login
@@ -292,7 +297,10 @@ const logged_browse_product = async (req, res, next) => {
         next(err);
     }
 }
-const load_profile = async (req, res, next) => {
+
+
+
+const loadProfile = async (req, res, next) => {
     try {
         const user = req.session.login
         const userdata = req.session.login
@@ -302,7 +310,7 @@ const load_profile = async (req, res, next) => {
         next(err);
     }
 }
-const add_address = async (req, res, next) => {
+const addAddress = async (req, res, next) => {
     try {
         let alertMessage = req.session.addmessage
         req.session.addmessage = ""
@@ -313,7 +321,9 @@ const add_address = async (req, res, next) => {
         next(err);
     }
 }
-const edit_user = async (req, res, next) => {
+
+
+const editUser = async (req, res, next) => {
     try {
         req.session.cart = false
         const userdata = req.session.login
@@ -324,7 +334,7 @@ const edit_user = async (req, res, next) => {
         next(err);
     }
 }
-const insert_address = async (req, res, next) => {
+const insertAddress = async (req, res, next) => {
     try {
         const id = req.session.login
         const { house, city, district, state, post } = req.body
@@ -364,7 +374,7 @@ const insert_address = async (req, res, next) => {
         next(err)
     }
 }
-const load_address = async (req, res, next) => {
+const loadAddress = async (req, res, next) => {
     try {
         alertMessage = req.session.addmessage
         req.session.addmessage = ""
@@ -376,7 +386,7 @@ const load_address = async (req, res, next) => {
         next(err)
     }
 }
-const delete_address = async (req, res, next) => {
+const deleteAddress = async (req, res, next) => {
     try {
         const addr_id = req.params.id
         id = req.session.login._id
@@ -392,7 +402,7 @@ const delete_address = async (req, res, next) => {
         next(err)
     }
 }
-const update_profile = async (req, res, next) => {
+const updateProfile = async (req, res, next) => {
     try {
         const userid = req.session.login._id
         const { name, email, mobile } = req.body
@@ -403,13 +413,13 @@ const update_profile = async (req, res, next) => {
                 mobile: mobile
             }
         })
-        res.redirect(`/profile/${userid}`)
+        res.redirect(`/profile`)
     } catch (err) {
         console.log(err.message)
         next(err)
     }
 }
-const view_cart = async (req, res, next) => {
+const viewCart = async (req, res, next) => {
     try {
         req.session.cart = true
         const user = req.session.login
@@ -420,7 +430,7 @@ const view_cart = async (req, res, next) => {
         next(error)
     }
 }
-const add_to_cart = async (req, res, next) => {
+const addToCart = async (req, res, next) => {
     try {
         const { pdt_id } = req.body
         const id = req.session.login._id
@@ -473,7 +483,7 @@ const add_to_cart = async (req, res, next) => {
         next(err)
     }
 }
-const delete_product_cart = async (req, res, next) => {
+const deleteProductCart = async (req, res, next) => {
     try {
         const { pdt_id } = req.body
         const id = req.session.login._id
@@ -495,7 +505,7 @@ const delete_product_cart = async (req, res, next) => {
         next(error)
     }
 }
-const remove_cart = async (req, res, next) => {
+const removeCart = async (req, res, next) => {
     try {
         const { pdt_id } = req.body
         const id = req.session.login._id
@@ -513,28 +523,33 @@ const remove_cart = async (req, res, next) => {
         next(error)
     }
 }
-const view_shop_after = async (req, res, next) => {
+
+
+const viewShopAfter = async (req, res, next) => {
     try {
-        const category = await categorySearch.find({});
+        
         const user = req.session.login
         const { products } = req.session
+        let category = req.session.category
         res.render('shop-after', { products, user, category })
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const view_shop_before = async (req, res, next) => {
+const viewShopBefore = async (req, res, next) => {
     try {
-        const category = await categorySearch.find({});
         const { products } = req.session
-        res.render('shop-before', { products, category,user:false })
+        let category = req.session.category
+        res.render('shop-before', { products, category})
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
-const load_checkout = async (req, res, next) => {
+
+
+const loadCheckout = async (req, res, next) => {
     try {
         const user = req.session.login
         const users = await userModify.findOne({ _id: user }).populate("cart.product")
@@ -544,7 +559,7 @@ const load_checkout = async (req, res, next) => {
         next(error)
     }
 }
-const post_order = async (req, res, next) => {
+const postOrder = async (req, res, next) => {
     try {
         let { name, house, post, city, state, district, totalprice, mobile, payment, coupon } = req.body
         const user = req.session.login
@@ -567,7 +582,8 @@ const post_order = async (req, res, next) => {
                 }
             }
         }
-        const currentDateAndTime = new Date();
+        let currentDateAndTime = moment();
+        currentDateAndTime = currentDateAndTime.format('MMMM Do YYYY, h:mm:ss a')
         const newOrder = new orderPlace({
             user: user._id,
             products: products,
@@ -588,9 +604,7 @@ const post_order = async (req, res, next) => {
         const result = await newOrder.save()
         req.session.orderplaced = result
         if (result) {
-            await userModify.findOneAndUpdate({ _id: user._id }, {
-                $unset: { cart: 1 }
-            })
+            
             await userModify.findOneAndUpdate({ _id: user._id }, {
                 $push: {
                     userorders: {
@@ -620,13 +634,12 @@ const post_order = async (req, res, next) => {
                     receipt: result._id,
                     payment_capture: 1,
                 };
-
+                const orderNo = result._id
                 razorpay.orders.create(options, function (err, order) {
                     if (err) {
                         res.json({ status: false })
                     } else {
-                        req.session.orderid = order.id
-                        res.json(order)
+                        res.json({order,orderNo})
                     }
                 });
             }
@@ -639,15 +652,21 @@ const post_order = async (req, res, next) => {
         next(error)
     }
 }
+
 const conformation = async (req, res, next) => {
     try {
-        const user = req.session.login
+        let  user = req.session.login
         const orderid = req.session.orderplaced._id
+        await userModify.findOneAndUpdate({ _id: user._id }, {
+            $unset: { cart: 1 }
+        })
+        user.cart = []
         await orderPlace.findOneAndUpdate({ _id: orderid }, {
             $push: {
                 orderstatus: "order recieved"
             }
         })
+        
         const orderDetails = await orderPlace.findOne({ _id: orderid }).populate("products.product")
         res.render("order-placed", { orderDetails, user })
     } catch (error) {
@@ -655,7 +674,7 @@ const conformation = async (req, res, next) => {
         next(error)
     }
 }
-const verify_payment = async (req, res, next) => {
+const verifPayment = async (req, res, next) => {
     try {
         const { razorpay_payment_id, razorpay_signature } = req.body
         const order_id = req.session.orderid
@@ -664,6 +683,7 @@ const verify_payment = async (req, res, next) => {
         const generated_signature = crypto.createHmac('sha256', secret)
             .update(message)
             .digest('hex');
+
         if (generated_signature === razorpay_signature) {
             const orderid = req.session.orderplaced._id
             await orderPlace.findOneAndUpdate({ _id: orderid }, {
@@ -677,7 +697,7 @@ const verify_payment = async (req, res, next) => {
             })
         } else {
             res.json({
-                payment: false,
+                payment: true,
                 orderid: req.session.orderid
             })
         }
@@ -686,7 +706,7 @@ const verify_payment = async (req, res, next) => {
         next(error)
     }
 }
-const list_orders = async (req, res, next) => {
+const listOrders = async (req, res, next) => {
     try {
         const user = req.session.login
         const userOrders = await orderPlace.find({ user: user._id })
@@ -696,7 +716,7 @@ const list_orders = async (req, res, next) => {
         next(error)
     }
 }
-const view_wish_list = async (req, res, next) => {
+const viewWishList = async (req, res, next) => {
     try {
         const id = req.session.login._id
         const user = await userModify.findOne({ _id: id }).populate("wishlist.product")
@@ -706,7 +726,7 @@ const view_wish_list = async (req, res, next) => {
         next(error)
     }
 }
-const add_to_wish_list = async (req, res, next) => {
+const addToWishList = async (req, res, next) => {
     try {
         const { pdt_id } = req.body
         const id = req.session.login._id
@@ -722,7 +742,7 @@ const add_to_wish_list = async (req, res, next) => {
         next(error)
     }
 }
-const remove_wish_list = async (req, res, next) => {
+const removeWishList = async (req, res, next) => {
     try {
         const { pdt_id } = req.body
         const id = req.session.login._id
@@ -736,7 +756,7 @@ const remove_wish_list = async (req, res, next) => {
         next(error)
     }
 }
-const check_coupon = async (req, res, next) => {
+const checkCoupon = async (req, res, next) => {
     try {
         const { coupon } = req.body
         const id = req.session.login._id
@@ -779,7 +799,7 @@ const check_coupon = async (req, res, next) => {
         next(error)
     }
 }
-const email_validarion = async (req, res, next) => {
+const emailValidarion = async (req, res, next) => {
     try {
         const email = req.body.email
         if (validateEmail(email) == false) {
@@ -797,7 +817,7 @@ const email_validarion = async (req, res, next) => {
         console.log(error.message)
     }
 }
-const cancel_order = async (req, res, next) => {
+const cancelOrder = async (req, res, next) => {
     try {
         const orderid = req.body.id
         const user = req.session.login._id
@@ -823,7 +843,7 @@ const cancel_order = async (req, res, next) => {
         next(error)
     }
 }
-const address_on_checkout = async (req, res, next) => {
+const addressOnCheckout = async (req, res, next) => {
     try {
         const id = req.session.login
         const { house, city, district, state, post } = req.body
@@ -844,7 +864,7 @@ const address_on_checkout = async (req, res, next) => {
         next(error)
     }
 }
-const wallet_check = async (req, res, next) => {
+const walletCheck = async (req, res, next) => {
     try {
         const wallet = req.session.login.wallet
         const amount = req.body.amount
@@ -861,7 +881,7 @@ const wallet_check = async (req, res, next) => {
         next(error)
     }
 }
-const order_details = async (req, res, next) => {
+const orderDetails = async (req, res, next) => {
     try {
         const user = req.session.login
         const orderId = req.params.id
@@ -873,49 +893,89 @@ const order_details = async (req, res, next) => {
     }
 }
 
+const parmentFailed = async (req,res,next)=>{
+    try {
+        const id = req.params.id
+        const result = await orderPlace.findOneAndRemove({_id:id})
+        .then(()=>{
+            res.render("paymentFailed",{user:req.session.login})
+        })
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+
+const paymentChange = async(req,res,next)=>{
+    try {
+        const user = req.session.login
+        const id = req.body.order
+        const payment = req.body.payment
+        if (payment == 'WLT'){
+            const walletbalance = user.wallet - (totalprice / 100)
+            await userModify.findOneAndUpdate({ _id: user._id },
+                {
+                    $set: { "wallet": walletbalance }
+                })
+            await orderPlace.findOneAndUpdate({ _id: result._id }, {
+                $set: {
+                    paymentstatus: "Completed"
+                }
+            })
+            res.json({ payment: payment, orderid: result._id })
+        }
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+}
 module.exports = {
-    order_details,
-    wallet_check,
-    address_on_checkout,
-    cancel_order,
-    email_validarion,
-    check_coupon,
-    remove_wish_list,
-    add_to_wish_list,
-    view_wish_list,
-    list_orders,
+    parmentFailed,
+    paymentChange,
+    orderDetails,
+    walletCheck,
+    addressOnCheckout,
+    cancelOrder,
+
+    emailValidarion,
+
+    checkCoupon,
+    removeWishList,
+    addToWishList,
+    viewWishList,
+    listOrders,
     conformation,
-    verify_payment,
-    change_pass,
-    post_otp_pass,
-    post_number_forget_pass,
-    load_forgot_password,
-    load_SignUp,
-    load_email_send,
-    post_email,
-    verify_Otp,
-    post_order,
-    load_checkout,
-    view_shop_after,
-    view_shop_before,
-    view_cart,
-    add_to_cart,
-    remove_cart,
-    delete_product_cart,
-    load_landing,
-    load_SignIn,
-    load_profile,
-    load_Home,
-    edit_user,
-    update_profile,
-    insert_address,
-    delete_address,
-    add_address,
-    load_address,
+    verifPayment,
+    changePass,
+    postOtpPass,
+    postNumberForgetPass,
+    loadForgotPassword,
+    loadSignUp,
+    loadEmailSend,
+    postEmail,
+    verifyOtp,
+    postOrder,
+    loadCheckout,
+    viewShopAfter,
+    viewShopBefore,
+    viewCart,
+    addToCart,
+    removeCart,
+    deleteProductCart,
+    loadLanding,
+    loadSignIn,
+    loadProfile,
+    loadHome,
+    editUser,
+    updateProfile,
+    insertAddress,
+    deleteAddress,
+    addAddress,
+    loadAddress,
     logout,
-    post_SignIn,
-    post_SignUp,
-    not_logged_browse_Product,
-    logged_browse_product,
-    email_check
+    postSignIn,
+    postSignUp,
+    notLoggedBrowseProduct,
+    loggedBrowseProduct,
+    emailCheck
 }

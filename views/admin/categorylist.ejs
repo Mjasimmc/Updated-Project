@@ -1,6 +1,9 @@
 <%- include('../adminlayout/header.ejs') %>
     <%- include('../adminlayout/navbar.ejs') %>
-
+    <script>
+        let dashboardLink = document.getElementById("category");
+    dashboardLink.classList.add("active");
+    </script>
         <div class="container-fluid pt-4 px-4">
             <a href="/admin/category">
                 <button class="btn btn-primary">Add category</button>

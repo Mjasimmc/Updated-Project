@@ -5,19 +5,17 @@
 			<div class="container">
 				<div class="flex-w flex-sb-m p-b-52">
 					<div class="flex-w flex-l-m filter-tope-group m-tb-10">
-						<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 how-active1" data-filter="*">
+						<!-- <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 how-active1" data-filter="*">
 							All Products
 						</button>
 						<% category.forEach(element=> { %>
 
-							<% if (element.products> 0) { %>
 
 								<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5"
-									data-filter=".<%= element.category %>">
-									<%= element.category %>
+									data-filter=".<%= element %>">
+									<%= element %>
 								</button>
-								<% } %>
-									<% }) %>
+									<% }) %> -->
 					</div>
 
 					<div class="flex-w flex-c-m m-tb-10">
@@ -60,13 +58,11 @@
 							</button>
 							<% category.forEach(element=> { %>
 	
-								<% if (element.products> 0) { %>
 	
 									<button class="col-12 btn-info btn" style="font-size: 15px; margin: 3px;"
-										data-filter=".<%= element.category %>">
-										<%= element.category %>
+										data-filter=".<%= element %>">
+										<%= element %>
 									</button>
-									<% } %>
 										<% }) %>
 						</div>
 					</div>
@@ -75,16 +71,15 @@
 					
 
 
-					<% products.forEach((element,index)=> { 
-						 if (element.stock > 0) { %>
+					<% products.forEach((element,index)=> { %>
 						<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item <%= element.category.category %>">
 							<!-- Block2 -->
 							<div class="block2">
 								<div class="block2-pic hov-img0">
 
 									<a href="/product-home/<%= element._id %>">
-										<img src="/Productimages/<%= element.image[0] %>" style="object-fit: contain;"
-											height="250px" alt="IMG-PRODUCT">
+										<img src="/ProductImages/<%= element.image[0] %>" height="270px"
+                                        style="object-fit: contain;" alt="IMG-PRODUCT">
 
 									</a>
 								</div>
@@ -115,34 +110,39 @@
                                                 src="userTemplate/images/icons/icon-heart-02.png" alt="ICON">
                                         </button>
                                     </div>
-									<% let product = false
+									<% if (element.stock > 0 ){%>
+                                    <% let product = false
+                                    
                                     for( let index = 0; index < user.cart.length; index++ ) { 
-                                        
                                         if (user.cart[index].product == element._id) {
-                                            product = true
-                                        } 
-                                     } %>
+                                            product = true }  } %>
+                                    
                                      <% if (product == true) { %>
-										<a href="/view-cart" id="goto<%= index %>" class="flex-c-m stext-101 cl0 bg3 bor14 hov-btn3 p-lr-15  pointer" style="padding: 10px;"	>
-											
+										<a href="/view-cart" id="goto<%= index %>" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
 											Go to cart
 										</a>
                                       <% } else { %>
                                         <button onclick="increment('<%= element._id %>','<%= index %>')"
                                             id="button<%= index %>"
-                                            class="flex-c-m stext-101 cl0 bg3 bor14 hov-btn3 p-lr-15  pointer" style="padding: 10px;">
+                                            class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
                                             Add to cart
                                         </button>
                                      <% } %>
-                                     <a href="/view-cart" id="goto<%= index %>" style="display: none;" class="flex-c-m stext-101 cl0 bg3 bor14 hov-btn3 p-lr-15  pointer" style="padding: 10px;">
-										<button class="flex-c-m stext-101 cl0 bg3 bor14 hov-btn3 p-lr-15  pointer" style="padding: 10px;">
+                                     <a href="/view-cart" id="goto<%= index %>" style="display: none;" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
+										<button
+                                        class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
                                         Go to cart
                                     </button></a>
+                                    <% }else{ %>
+                                    <div onclick="showNon()" class="btn-danger flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15  pointer">
+                                        Out of Stock
+										</div>
+                                    <%}%>
                                     
 								</div>
 							</div>
 						</div>
-						<%} }) %>
+						<% }) %>
 					</div>
 				</div>
 
@@ -157,6 +157,15 @@
 
 
 	<script>
+		function showNon(){
+				Swal.fire({
+					position: 'center',
+					icon: 'info',
+					title: 'Out of Stock',
+					showConfirmButton: false,
+					timer: 1000
+				})
+			}
 		function increment(pdt_id,num) {
 			document.getElementById(`goto${num}`).style.display = ""
 			document.getElementById(`button${num}`).style.display = "none"
